@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"time"
 
+	"SinguGPT/imap"
 	"SinguGPT/models"
 	"SinguGPT/smtp"
 	"SinguGPT/store"
@@ -35,5 +38,32 @@ func main() {
 	})
 	if err != nil {
 		panic(err)
+	}
+	// 对接 IMAP
+	imapClient := imap.NewClient(&imap.EmailConfig{
+		Host:     store.Config.Email.IMAP.Host,
+		Port:     store.Config.Email.IMAP.Port,
+		Username: store.Config.Email.IMAP.UserName,
+		Password: store.Config.Email.IMAP.Password,
+		Debug:    false,
+	})
+	mails := make(chan *imap.Mail, 20)
+	errorChannel := make(chan error, 1)
+	err = imapClient.Read(mails, errorChannel, 5*time.Second)
+	if err != nil {
+		panic(err)
+	}
+	go func() {
+		err := <-errorChannel
+		if err != nil {
+			panic(err)
+		}
+	}()
+	for {
+		mail := <-mails
+		log.Printf("Email => %v", mail)
+		for index, content := range mail.Contents {
+			log.Printf("EmailContents %d => %v", index, content)
+		}
 	}
 }
