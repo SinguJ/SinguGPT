@@ -1,0 +1,16 @@
+app:
+  name: SinguGPT
+  user-data-file: ./users.yml
+openai:
+  apikey: <OpenAI API Key>
+email:
+  smtp:
+    host: <SMTP Host>
+    port: <SMTP Port>
+    username: <SMTP UserName>
+    password: <SMTP Password>
+  imap:
+    host: <IMAP Host>
+    port: <IMAP Port>
+    username: <IMAP UserName>
+    password: <IMAP Password>

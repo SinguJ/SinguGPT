@@ -1,0 +1,11 @@
+users:
+  userid1:
+    name: Foo
+    emails:
+      - foo@example.com
+      - foo@gmail.com
+  userid2:
+    name: Bar
+    emails:
+      - bar@example.com
+      - bar@gmail.com
