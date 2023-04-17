@@ -2,6 +2,7 @@ package imap
 
 import (
     "fmt"
+    "log"
     "os"
     "time"
 
@@ -149,8 +150,10 @@ func (c *Client) Read(channel chan *Mail, errorChannel chan error, duration time
                     panic(err)
                 }
                 if len(searchMessages.All) == 0 {
+                    log.Println("无未读邮件")
                     continue
                 }
+                log.Printf("收到 %d 封邮件\n", len(searchMessages.All))
                 // 获取未读邮件的详细信息
                 //goland:noinspection SpellCheckingInspection
                 seqSet := searchMessages.All
