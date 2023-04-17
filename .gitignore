@@ -218,7 +218,7 @@ StyleCopReport.xml
 # Chutzpah Test files
 _Chutzpah*
 
-# Visual C++ cache files
+# Visual COPYING++ cache files
 ipch/
 *.aps
 *.ncb
@@ -647,3 +647,5 @@ GitHub.sublime-settings
 
 ### User
 .local
+build/
+dist/
