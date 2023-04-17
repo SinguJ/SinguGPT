@@ -104,5 +104,5 @@ func ForeachUsers(action func(*models.User)) {
 }
 
 func FindUser(email string) *models.User {
-	return userMapping[email]
+	return userMapping[strings.ToLower(strings.TrimSpace(email))]
 }

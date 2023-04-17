@@ -3,9 +3,9 @@ package main
 import (
     "fmt"
     "log"
-    "strings"
     "time"
 
+    "SinguGPT/action"
     "SinguGPT/gpt"
     "SinguGPT/imap"
     "SinguGPT/models"
@@ -27,16 +27,8 @@ func init() {
     gpt.Login(store.Config.OpenAI.ApiKey)
 }
 
-func findSession(user *models.User, email string) string {
-    return user.ID + "/" + email
-}
-
-func action(sessionKey string, user *models.User, content string) (string, error) {
-    cmd := strings.TrimSpace(content)
-    if cmd == "帮助" {
-        return "", nil
-    }
-    return gpt.Chat(sessionKey, user, content)
+func findSession(user *models.User, _ string) string {
+    return user.ID
 }
 
 func sendEmail(user *models.User, email string, content string) {
@@ -95,9 +87,10 @@ func main() {
         go func(currUser *models.User, email string) {
             log.Printf("[INFO] 处理用户 %s<%s> 的请求\n", currUser.Name, email)
             sessionKey := findSession(currUser, email)
-            resp, err := action(sessionKey, currUser, mail.Contents[0].Text)
+            resp, err := action.DoAction(mail.Subject, sessionKey, currUser, mail.Contents[0].Text)
             if err != nil {
                 resp = fmt.Sprintf("%v", err)
+                log.Fatalln(err)
             }
             sendEmail(currUser, email, resp)
         }(_currUser, _email)
