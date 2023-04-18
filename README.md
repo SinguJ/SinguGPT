@@ -9,7 +9,7 @@
 1. 下载源代码
 
 ```shell
-git clone git@github.com:SinguJ/SinguGPT.git
+git clone git@github.com:singu-tech/SinguGPT.git
 cd SinguGPT
 ```
 
