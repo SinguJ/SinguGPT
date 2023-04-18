@@ -4,6 +4,10 @@ import (
     "context"
     "errors"
     "fmt"
+    "log"
+    "net/http"
+    "net/url"
+    "os"
 
     "github.com/sashabaranov/go-openai"
 
@@ -14,6 +18,19 @@ var client *openai.Client
 
 func Login(apiKey string) {
     config := openai.DefaultConfig(apiKey)
+    if proxyServ := os.Getenv("SINGU_GPT_PROXY"); proxyServ != "" {
+        log.Printf("使用代理服务器：%s\n", proxyServ)
+        _proxyUrl, err := url.Parse(proxyServ)
+        if err != nil {
+            panic(err)
+        }
+        httpClient := &http.Client{
+            Transport: &http.Transport{
+                Proxy: http.ProxyURL(_proxyUrl),
+            },
+        }
+        config.HTTPClient = httpClient
+    }
     client = openai.NewClientWithConfig(config)
 }
 
