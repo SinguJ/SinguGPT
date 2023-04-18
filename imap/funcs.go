@@ -8,6 +8,7 @@ import (
 
     "github.com/emersion/go-imap/v2"
     "github.com/emersion/go-imap/v2/imapclient"
+    _ "github.com/emersion/go-message/charset"
     mailLib "github.com/emersion/go-message/mail"
 )
 
