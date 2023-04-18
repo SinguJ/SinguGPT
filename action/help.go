@@ -1,16 +1,9 @@
 package action
 
 import (
-    "strings"
-
     "SinguGPT/models"
     "SinguGPT/store"
 )
-
-func stringFormat(format string, args ...string) string {
-    r := strings.NewReplacer(args...)
-    return r.Replace(format)
-}
 
 func init() {
     // 3.  邮件主题为 "NewSession" 或 "新会话"，邮件内容为 "ChatGPT"
@@ -25,10 +18,14 @@ func init() {
     要与我们的 GPT 程序互动，请向以下电子邮件地址发送邮件：{AppEmail}。我们的程序将会自动处理您发送的邮件。
 	
 2.  邮件主题为 "ChatGPT"
-    如果您希望获得 ChatGPT 的回复，请将邮件主题设置为 "ChatGPT"。程序将识别您的请求，并给您回复 ChatGPT 响应的消息。
+    如果您希望获得 ChatGPT 的回复，请将邮件标题设置为 "ChatGPT"。程序将识别您的请求，并给您回复 ChatGPT 响应的消息。
 	
-3.  其他邮件主题
-    如果您发送的邮件主题不属于上述任何一种，那么程序将自动回复本帮助信息，以便您随时了解如何使用我们的 GPT 程序。
+3.  其他邮件标题
+    如果您发送的邮件标题不属于上述任何一种，那么程序将自动回复本帮助信息，以便您随时了解如何使用我们的 GPT 程序。
+
+4.  彩蛋
+    我们在 GPT 程序中保留一些彩蛋，这样您才知道您用的是 {AppName}。:)
+    您可以尝试不同的邮件标题，或许可以触发某个彩蛋呦~~ 友情提示：程序员、世界
 	
 希望这些信息能够帮助您更好地使用我们的邮件版 GPT 程序。如果您有任何疑问，请随时联系我们，我们将竭诚为您服务。祝您使用愉快！
 
