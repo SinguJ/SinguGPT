@@ -105,14 +105,7 @@ func (c *Client) close() error {
     return nil
 }
 
-func (c *Client) Read(channel chan *Mail, errorChannel chan error, duration time.Duration) error {
-    err := c.login()
-    if err != nil {
-        if c.config.Debug {
-            panic(err)
-        }
-        return err
-    }
+func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration time.Duration) error {
     go func() {
         defer func() {
             if !c.config.Debug {
@@ -129,15 +122,26 @@ func (c *Client) Read(channel chan *Mail, errorChannel chan error, duration time
                 panic(err)
             }
         }()
-
+        err := c.login()
+        if err != nil {
+            panic(err)
+        }
         // 定期检查新邮件
         c.ticker = time.NewTicker(duration)
         for {
             select {
             case <-c.ticker.C:
                 // 选择收件箱
-                _, err := c.dialer.Select("INBOX", nil).Wait()
+                _, err = c.dialer.Select("INBOX", nil).Wait()
                 if err != nil {
+                    // 检查客户端状态
+                    if c.dialer == nil || c.dialer.State() == imap.ConnStateLogout {
+                        err = c.login()
+                        if err != nil {
+                            panic(err)
+                        }
+                        continue
+                    }
                     panic(err)
                 }
                 // 使用 UNSEEN 搜索条件获取未读邮件

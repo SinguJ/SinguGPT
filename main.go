@@ -66,7 +66,7 @@ func main() {
     })
     mails := make(chan *imap.Mail, 20)
     errorChannel := make(chan error, 1)
-    err := imapClient.Read(mails, errorChannel, 5*time.Second)
+    err := imapClient.Listen(mails, errorChannel, 5*time.Second)
     if err != nil {
         panic(err)
     }
