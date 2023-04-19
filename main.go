@@ -10,7 +10,6 @@ import (
     "SinguGPT/access/email/imap"
     "SinguGPT/access/email/smtp"
     "SinguGPT/action"
-    "SinguGPT/gpt"
     "SinguGPT/models"
     "SinguGPT/store"
 )
@@ -26,7 +25,6 @@ func init() {
         store.Config.App.Name,
         fmt.Sprintf("[%s] 响应", store.Config.App.Name),
     )
-    gpt.Login(store.Config.OpenAI.ApiKey)
 }
 
 func findSession(user *models.User, _ string) string {
