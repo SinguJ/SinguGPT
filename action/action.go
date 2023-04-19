@@ -36,11 +36,17 @@ func RegisterActionFunc(af ActionFunc, keywords ...string) {
     })
 }
 
-func DoAction(subject string, sessionId string, requestId string, user *models.User, content string) (resp string, err error) {
-    keyword := strings.ToLower(strings.TrimSpace(subject))
+func DoAction(sessionId string, requestId string, user *models.User, req models.Contents) (resp models.Contents, err error) {
+    keyword := strings.ToLower(strings.TrimSpace(req.MustFindOne(models.TagCommand).ToString()))
     var action *Action
     if action = Actions[keyword]; action == nil {
         action = Actions[DefaultAction]
     }
-    return action.Action(sessionId, requestId, user, content)
+    _resp, err := action.Action(sessionId, requestId, user, req.MustFindOne(models.TagBody).ToString())
+    if err != nil {
+        return nil, err
+    }
+    return models.Contents{
+        models.NewTextContent(models.TagBody, _resp),
+    }, nil
 }
