@@ -34,9 +34,7 @@ func findSession(user *models.User, _ string) string {
 }
 
 func sendEmail(user *models.User, email string, content string) error {
-    return smtpClient.Push(user, email, &models.Message{
-        Msg: content,
-    })
+    return smtpClient.Push(user, email, models.NewTextContent(models.TagBody, content))
 }
 
 func main() {
