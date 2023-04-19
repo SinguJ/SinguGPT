@@ -48,7 +48,7 @@ func LoadAndWatchUsers() {
 	// 创建文件系统监视器
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	defer func(watcher *fsnotify.Watcher) {
 		err := watcher.Close()
@@ -66,17 +66,18 @@ func LoadAndWatchUsers() {
 					return
 				}
 				if event.Op&fsnotify.Write == fsnotify.Write {
+					log.Println("[INFO - WATCH_USERS] 检测到用户配置文件变更")
 					// 文件发生写入操作，调用 Load 函数
 					err := loadUsers(event.Name)
 					if err != nil {
-						log.Println(err)
+						log.Printf("[ERROR - WATCH_USERS] %v\n", err)
 					}
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
 				}
-				log.Println("error:", err)
+				log.Printf("[ERROR - WATCH_USERS] %v\n", err)
 			}
 		}
 	}()
@@ -84,16 +85,16 @@ func LoadAndWatchUsers() {
 	// 添加要监视的文件
 	absPath, err := filepath.Abs(Config.App.UserDataFile)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	err = watcher.Add(absPath)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	// 手动触发一次
 	err = loadUsers(absPath)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
 

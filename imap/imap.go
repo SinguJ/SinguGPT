@@ -154,10 +154,10 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                     panic(err)
                 }
                 if len(searchMessages.All) == 0 {
-                    log.Println("无未读邮件")
+                    log.Println("[INFO - IMAP] 无未读邮件")
                     continue
                 }
-                log.Printf("收到 %d 封邮件\n", len(searchMessages.All))
+                log.Printf("[INFO - IMAP] 收到 %d 封邮件\n", len(searchMessages.All))
                 // 获取未读邮件的详细信息
                 //goland:noinspection SpellCheckingInspection
                 seqSet := searchMessages.All

@@ -33,17 +33,20 @@ func findSession(user *models.User, _ string) string {
     return user.ID
 }
 
-func sendEmail(user *models.User, email string, content string) {
-    err := smtpClient.Push(user, email, &models.Message{
+func sendEmail(user *models.User, email string, content string) error {
+    return smtpClient.Push(user, email, &models.Message{
         Msg: content,
     })
-    if err != nil {
-        log.Fatal(err)
-    }
 }
 
 func main() {
     println(fmt.Sprintf("应用程序名称：%s\n", store.Config.App.Name))
+    defer func() {
+        err := recover()
+        if err != nil {
+            log.Fatalf("[ERROR] %v", err)
+        }
+    }()
     // 加载并监听用户配置文件
     store.LoadAndWatchUsers()
     // 遍历用户集
@@ -94,7 +97,10 @@ func main() {
                     resp = fmt.Sprintf("%v", err)
                     log.Printf("[ERROR]--- %s %v", requestId, err)
                 }
-                sendEmail(currUser, email, resp)
+                err = sendEmail(currUser, email, resp)
+                if err != nil {
+                    log.Printf("[ERROR]--- %s %v", requestId, err)
+                }
                 log.Printf("[INFO]<<< %s 用户 %s<%s> 的请求处理完成\n", requestId, currUser.Name, email)
             }()
         }
