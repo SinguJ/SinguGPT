@@ -87,14 +87,15 @@ func main() {
                     return
                 }
                 requestId := uuid.NewString()
-                log.Printf("[INFO] %s 处理用户 %s<%s> 的请求\n", requestId, currUser.Name, email)
+                log.Printf("[INFO]>>> %s 处理用户 %s<%s> 的请求\n", requestId, currUser.Name, email)
                 sessionId := findSession(currUser, email)
                 resp, err := action.DoAction(mail.Subject, sessionId, requestId, currUser, mail.Contents[0].Text)
                 if err != nil {
                     resp = fmt.Sprintf("%v", err)
-                    log.Printf("[ERROR] %s %v", requestId, err)
+                    log.Printf("[ERROR]--- %s %v", requestId, err)
                 }
                 sendEmail(currUser, email, resp)
+                log.Printf("[INFO]<<< %s 用户 %s<%s> 的请求处理完成\n", requestId, currUser.Name, email)
             }()
         }
     }
