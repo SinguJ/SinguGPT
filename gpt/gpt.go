@@ -34,10 +34,8 @@ func Login(apiKey string) {
     client = openai.NewClientWithConfig(config)
 }
 
-func Chat(sessionKey string, user *models.User, content string) (string, error) {
-    ctx := context.Background()
-
-    req := openai.ChatCompletionRequest{
+func NewChatRequest(sessionKey string, _ *models.User, content string) *openai.ChatCompletionRequest {
+    return &openai.ChatCompletionRequest{
         Model: openai.GPT3Dot5Turbo,
         User:  sessionKey,
         Messages: []openai.ChatCompletionMessage{
@@ -47,27 +45,20 @@ func Chat(sessionKey string, user *models.User, content string) (string, error) 
             },
         },
     }
-    response, err := client.CreateChatCompletion(ctx, req)
+}
+
+func Chat(req *openai.ChatCompletionRequest) (string, error) {
+    ctx := context.Background()
+    response, err := client.CreateChatCompletion(ctx, *req)
     if err != nil {
         return "", errors.New(fmt.Sprintf("CompletionStream error: %v\n", err))
     }
     return response.Choices[0].Message.Content, nil
 }
 
-func ChatStream(sessionKey string, user *models.User, content string) (*openai.ChatCompletionStream, error) {
+func ChatStream(req *openai.ChatCompletionRequest) (*openai.ChatCompletionStream, error) {
     ctx := context.Background()
-
-    req := openai.ChatCompletionRequest{
-        Model: openai.GPT3Dot5Turbo,
-        User:  sessionKey,
-        Messages: []openai.ChatCompletionMessage{
-            {
-                Role:    openai.ChatMessageRoleUser,
-                Content: content,
-            },
-        },
-    }
-    stream, err := client.CreateChatCompletionStream(ctx, req)
+    stream, err := client.CreateChatCompletionStream(ctx, *req)
     if err != nil {
         return nil, errors.New(fmt.Sprintf("CompletionStream error: %v\n", err))
     }

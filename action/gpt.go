@@ -7,6 +7,7 @@ import (
 
 func init() {
     RegisterActionFunc(func(sessionKey string, user *models.User, content string) (resp string, err error) {
-        return gpt.Chat(sessionKey, user, content)
+        req := gpt.NewChatRequest(sessionKey, user, content)
+        return gpt.Chat(req)
     }, "ChatGPT", "GPT3", "GPT-3", "GPT3.0", "GPT-3.0")
 }
