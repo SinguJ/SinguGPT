@@ -70,29 +70,29 @@ func main() {
     if err != nil {
         panic(err)
     }
-    go func() {
-        err := <-errorChannel
-        if err != nil {
-            log.Fatal(err)
-        }
-    }()
     for {
-        mail := <-mails
-        _email := mail.From[0][0]
-        _currUser := store.FindUser(_email)
-        if _currUser == nil {
-            log.Printf("[WRANNING] 邮箱用户 %s<%s> 不是有效用户，跳过\n", mail.From[0][1], mail.From[0][0])
-            continue
-        }
-        go func(currUser *models.User, email string) {
-            log.Printf("[INFO] 处理用户 %s<%s> 的请求\n", currUser.Name, email)
-            sessionKey := findSession(currUser, email)
-            resp, err := action.DoAction(mail.Subject, sessionKey, currUser, mail.Contents[0].Text)
+        select {
+        case err := <-errorChannel:
             if err != nil {
-                resp = fmt.Sprintf("%v", err)
-                log.Fatalln(err)
+                log.Printf("[ERROR] %v", err)
             }
-            sendEmail(currUser, email, resp)
-        }(_currUser, _email)
+        case mail := <-mails:
+            go func() {
+                email := mail.From[0][0]
+                currUser := store.FindUser(email)
+                if currUser == nil {
+                    log.Printf("[WRANNING] 邮箱用户 %s<%s> 不是有效用户，跳过\n", mail.From[0][1], mail.From[0][0])
+                    return
+                }
+                log.Printf("[INFO] 处理用户 %s<%s> 的请求\n", currUser.Name, email)
+                sessionKey := findSession(currUser, email)
+                resp, err := action.DoAction(mail.Subject, sessionKey, currUser, mail.Contents[0].Text)
+                if err != nil {
+                    resp = fmt.Sprintf("%v", err)
+                    log.Printf("[ERROR] %v", err)
+                }
+                sendEmail(currUser, email, resp)
+            }()
+        }
     }
 }
