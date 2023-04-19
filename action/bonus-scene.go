@@ -1,15 +1,16 @@
 package action
 
 import (
-    "SinguGPT/models"
     _ "embed"
+
+    "SinguGPT/models"
 )
 
 //go:embed banner.txt
 var banner string
 
 func init() {
-    RegisterActionFunc(func(sessionKey string, user *models.User, content string) (resp string, err error) {
+    RegisterActionFunc(func(sessionId string, requestId string, user *models.User, content string) (resp string, err error) {
         return banner + `
 
 Github: https://github.com/singu-tech/SinguGPT

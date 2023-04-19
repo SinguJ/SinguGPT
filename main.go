@@ -5,6 +5,8 @@ import (
     "log"
     "time"
 
+    "github.com/google/uuid"
+
     "SinguGPT/action"
     "SinguGPT/gpt"
     "SinguGPT/imap"
@@ -84,12 +86,13 @@ func main() {
                     log.Printf("[WRANNING] 邮箱用户 %s<%s> 不是有效用户，跳过\n", mail.From[0][1], mail.From[0][0])
                     return
                 }
-                log.Printf("[INFO] 处理用户 %s<%s> 的请求\n", currUser.Name, email)
-                sessionKey := findSession(currUser, email)
-                resp, err := action.DoAction(mail.Subject, sessionKey, currUser, mail.Contents[0].Text)
+                requestId := uuid.NewString()
+                log.Printf("[INFO] %s 处理用户 %s<%s> 的请求\n", requestId, currUser.Name, email)
+                sessionId := findSession(currUser, email)
+                resp, err := action.DoAction(mail.Subject, sessionId, requestId, currUser, mail.Contents[0].Text)
                 if err != nil {
                     resp = fmt.Sprintf("%v", err)
-                    log.Printf("[ERROR] %v", err)
+                    log.Printf("[ERROR] %s %v", requestId, err)
                 }
                 sendEmail(currUser, email, resp)
             }()

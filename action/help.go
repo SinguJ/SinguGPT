@@ -8,7 +8,7 @@ import (
 func init() {
     // 3.  邮件主题为 "NewSession" 或 "新会话"，邮件内容为 "ChatGPT"
     // 当您需要创建一个新的 ChatGPT 会话时，请将邮件主题设置为 "NewSession" 或 "新会话"，并将邮件内容设置为 "ChatGPT"。程序将为您创建一个全新的会话。
-    RegisterActionFunc(func(sessionKey string, user *models.User, content string) (resp string, err error) {
+    RegisterActionFunc(func(sessionId string, requestId string, user *models.User, content string) (resp string, err error) {
         return stringFormat(`
 亲爱的用户，
 

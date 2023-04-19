@@ -7,6 +7,7 @@ require (
 	github.com/emersion/go-message v0.16.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
+	github.com/google/uuid v1.3.0
 	github.com/sashabaranov/go-openai v1.8.0
 	gopkg.in/yaml.v2 v2.4.0
 )

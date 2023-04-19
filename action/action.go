@@ -10,7 +10,7 @@ import (
 const DefaultAction = "*"
 
 //goland:noinspection GoNameStartsWithPackageName
-type ActionFunc func(sessionKey string, user *models.User, content string) (resp string, err error)
+type ActionFunc func(sessionId string, requestId string, user *models.User, content string) (resp string, err error)
 
 type Action struct {
     Keywords []string
@@ -36,11 +36,11 @@ func RegisterActionFunc(af ActionFunc, keywords ...string) {
     })
 }
 
-func DoAction(subject string, sessionKey string, user *models.User, content string) (resp string, err error) {
+func DoAction(subject string, sessionId string, requestId string, user *models.User, content string) (resp string, err error) {
     keyword := strings.ToLower(strings.TrimSpace(subject))
     var action *Action
     if action = Actions[keyword]; action == nil {
         action = Actions[DefaultAction]
     }
-    return action.Action(sessionKey, user, content)
+    return action.Action(sessionId, requestId, user, content)
 }
