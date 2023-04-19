@@ -1,6 +1,8 @@
 package store
 
 import (
+	"bytes"
+	"fmt"
 	"log"
 	"path/filepath"
 	"strings"
@@ -41,6 +43,19 @@ func loadUsers(path string) error {
 	users = _users
 	userMapping = _userMapping
 
+	// 遍历用户集
+	var user *models.User
+	var buff bytes.Buffer
+	ForeachUsers(func(_user *models.User) {
+		if user == nil {
+			user = _user
+		}
+		buff.WriteString(fmt.Sprintf("  %s:\n", _user.Name))
+		for _, email := range _user.Emails {
+			buff.WriteString(fmt.Sprintf("      - %s\n", email))
+		}
+	})
+	log.Printf("[INFO - USERS] 用户集：{{%%%%\n%s\n%%%%}}\n", buff.String())
 	return nil
 }
 
@@ -51,33 +66,42 @@ func LoadAndWatchUsers() {
 		panic(err)
 	}
 	defer func(watcher *fsnotify.Watcher) {
-		err := watcher.Close()
+		err := recover()
 		if err != nil {
+			_err := watcher.Close()
+			if _err != nil {
+				panic(_err)
+			}
 			panic(err)
 		}
 	}(watcher)
-
 	// 监听文件改动事件
 	go func() {
+		defer func(watcher *fsnotify.Watcher) {
+			err := watcher.Close()
+			if err != nil {
+				panic(err)
+			}
+		}(watcher)
 		for {
 			select {
 			case event, ok := <-watcher.Events:
 				if !ok {
 					return
 				}
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					log.Println("[INFO - WATCH_USERS] 检测到用户配置文件变更")
+				if event.Has(fsnotify.Write) {
+					log.Println("[INFO - USERS] 检测到用户配置文件变更")
 					// 文件发生写入操作，调用 Load 函数
 					err := loadUsers(event.Name)
 					if err != nil {
-						log.Printf("[ERROR - WATCH_USERS] %v\n", err)
+						log.Printf("[ERROR - USERS] %v\n", err)
 					}
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
 				}
-				log.Printf("[ERROR - WATCH_USERS] %v\n", err)
+				log.Printf("[ERROR - USERS] %v\n", err)
 			}
 		}
 	}()

@@ -49,18 +49,6 @@ func main() {
     }()
     // 加载并监听用户配置文件
     store.LoadAndWatchUsers()
-    // 遍历用户集
-    var user *models.User
-    fmt.Println("用户：")
-    store.ForeachUsers(func(_user *models.User) {
-        if user == nil {
-            user = _user
-        }
-        fmt.Printf("    %s\n", _user.Name)
-        for _, email := range _user.Emails {
-            fmt.Printf("        %s\n", email)
-        }
-    })
     // 接收邮件
     imapClient := imap.NewClient(&imap.EmailConfig{
         Host:     store.Config.Email.IMAP.Host,
