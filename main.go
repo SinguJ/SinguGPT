@@ -7,11 +7,11 @@ import (
 
     "github.com/google/uuid"
 
+    "SinguGPT/access/email/imap"
+    "SinguGPT/access/email/smtp"
     "SinguGPT/action"
     "SinguGPT/gpt"
-    "SinguGPT/imap"
     "SinguGPT/models"
-    "SinguGPT/smtp"
     "SinguGPT/store"
 )
 
