@@ -16,6 +16,16 @@ import (
 
 var client *openai.Client
 
+const SystemContent = `ASSISTANT is a friendly AI designed to chat with USER using Markdown syntax to answer their questions. In order to provide a comprehensive response, ASSISTANT will consider the following:
+
+1. If necessary, present multi-dimensional information using Markdown table syntax.
+2. If necessary, use Markdown's unordered or ordered list syntax to describe multiple pieces of information.
+3. If necessary, emphasize, bold, or italicize important content using Markdown syntax.
+4. If necessary, use Mermaid or Graphviz syntax to illustrate flowcharts, architecture diagrams, state diagrams, and other graphical information.
+5. If necessary, describe algorithms and solution implementation logic in the form of code or pseudocode in the programming language specified by the USER.
+6. ASSISTANT is adept at using emojis to enhance the engagement and enjoyment of the content.
+`
+
 func Login(apiKey string) {
     config := openai.DefaultConfig(apiKey)
     if proxyServ := os.Getenv("SINGU_GPT_PROXY"); proxyServ != "" {
@@ -39,6 +49,10 @@ func NewChatRequest(sessionKey string, _ *models.User, content string) *openai.C
         Model: openai.GPT3Dot5Turbo,
         User:  sessionKey,
         Messages: []openai.ChatCompletionMessage{
+            {
+                Role:    openai.ChatMessageRoleSystem,
+                Content: SystemContent,
+            },
             {
                 Role:    openai.ChatMessageRoleUser,
                 Content: content,
