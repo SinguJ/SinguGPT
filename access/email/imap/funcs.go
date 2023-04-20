@@ -10,6 +10,8 @@ import (
     "github.com/emersion/go-imap/v2/imapclient"
     _ "github.com/emersion/go-message/charset"
     mailLib "github.com/emersion/go-message/mail"
+
+    "SinguGPT/errors"
 )
 
 // 读取地址信息
@@ -41,7 +43,7 @@ func readBody(msg *imapclient.FetchMessageBuffer) ([]*Content, []*Attach) {
     text = prefix + strings.ReplaceAll(text, boundary, tag)
     reader, err := mailLib.CreateReader(bytes.NewReader([]byte(text)))
     if err != nil {
-        panic(err)
+        panic(errors.Wrap(err))
     }
     contents := make([]*Content, 0)
     attaches := make([]*Attach, 0)
@@ -52,7 +54,7 @@ func readBody(msg *imapclient.FetchMessageBuffer) ([]*Content, []*Attach) {
             if err == io.EOF {
                 break
             }
-            panic(err)
+            panic(errors.Wrap(err))
         }
         switch part.Header.(type) {
         case *mailLib.InlineHeader:
@@ -62,7 +64,7 @@ func readBody(msg *imapclient.FetchMessageBuffer) ([]*Content, []*Attach) {
             // 读取内容类型
             contentType, _, err := inlineHeader.ContentType()
             if err != nil {
-                panic(err)
+                panic(errors.Wrap(err))
             }
             switch contentType {
             case "text/plain":
@@ -77,7 +79,7 @@ func readBody(msg *imapclient.FetchMessageBuffer) ([]*Content, []*Attach) {
             // 读取内容文本
             data, err := io.ReadAll(part.Body)
             if err != nil {
-                panic(err)
+                panic(errors.Wrap(err))
             }
             content.Text = string(data)
             contents = append(contents, &content)
@@ -88,7 +90,7 @@ func readBody(msg *imapclient.FetchMessageBuffer) ([]*Content, []*Attach) {
             // 读取内容类型
             contentType, _, err := attachmentHeader.ContentType()
             if err != nil {
-                panic(err)
+                panic(errors.Wrap(err))
             }
             switch contentType {
             // TODO: 补充文件的 ContentType
@@ -98,13 +100,13 @@ func readBody(msg *imapclient.FetchMessageBuffer) ([]*Content, []*Attach) {
             // 读取文件名
             filename, err := attachmentHeader.Filename()
             if err != nil {
-                panic(err)
+                panic(errors.Wrap(err))
             }
             attach.Filename = filename
             // 读取文件数据&文件大小
             data, err := io.ReadAll(part.Body)
             if err != nil {
-                panic(err)
+                panic(errors.Wrap(err))
             }
             attach.Bytes = data
             attach.Size = len(data)
