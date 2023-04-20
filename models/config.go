@@ -7,6 +7,8 @@ type Config struct {
         Name string `yaml:"name"`
         // 用户配置文件
         UserDataFile string `yaml:"user-data-file"`
+        // 接入方式
+        AccessMethods []AccessMethod `yaml:"access-methods"`
     } `yaml:"app"`
     // OpenAI 相关配置
     OpenAI struct {

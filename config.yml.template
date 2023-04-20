@@ -1,6 +1,8 @@
 app:
   name: SinguGPT
   user-data-file: ./users.yml
+  access-methods:
+    - email
 openai:
   apikey: <OpenAI API Key>
 email:

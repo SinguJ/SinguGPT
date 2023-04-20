@@ -8,6 +8,8 @@ import (
 
     "github.com/emersion/go-imap/v2"
     "github.com/emersion/go-imap/v2/imapclient"
+
+    "SinguGPT/errors"
 )
 
 // EmailConfig IMAP 服务配置
@@ -51,7 +53,7 @@ func (c *Client) createDialer() (*imapclient.Client, error) {
     if err != nil {
         _ = c.dialer.Close()
         if c.config.Debug {
-            panic(err)
+            panic(errors.Wrap(err))
         }
         return nil, err
     }
@@ -60,11 +62,11 @@ func (c *Client) createDialer() (*imapclient.Client, error) {
 
 // Login 登录
 func (c *Client) login() error {
-    if c.dialer != nil && c.dialer.State() == imap.ConnStateLogout {
+    if c.dialer != nil && c.dialer.State() != imap.ConnStateLogout {
         err := c.close()
         if err != nil {
             if c.config.Debug {
-                panic(err)
+                panic(errors.Wrap(err))
             }
             return err
         }
@@ -72,7 +74,7 @@ func (c *Client) login() error {
     dialer, err := c.createDialer()
     if err != nil {
         if c.config.Debug {
-            panic(err)
+            panic(errors.Wrap(err))
         }
         return err
     }
@@ -92,9 +94,9 @@ func (c *Client) close() error {
         err := dialer.Close()
         if err != nil {
             if c.config.Debug {
-                panic(err)
+                panic(errors.Wrap(err))
             }
-            panic(err)
+            panic(errors.Wrap(err))
         }
     }(c.dialer)
     err := c.dialer.Logout().Wait()
@@ -119,12 +121,12 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
         defer func() {
             err := c.close()
             if err != nil {
-                panic(err)
+                panic(errors.Wrap(err))
             }
         }()
         err := c.login()
         if err != nil {
-            panic(err)
+            panic(errors.Wrap(err))
         }
         // 定期检查新邮件
         c.ticker = time.NewTicker(duration)
@@ -136,13 +138,15 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                 if err != nil {
                     // 检查客户端状态
                     if c.dialer == nil || c.dialer.State() == imap.ConnStateLogout {
+                        log.Println("[WARNING - IMAP] IMAP 连接被意外关闭，程序将自动重连...")
                         err = c.login()
                         if err != nil {
-                            panic(err)
+                            log.Printf("[ERROR - IMAP] IMAP 重连失败，原因是：%v\n", err)
+                            panic(errors.Wrap(err))
                         }
                         continue
                     }
-                    panic(err)
+                    panic(errors.Wrap(err))
                 }
                 // 使用 UNSEEN 搜索条件获取未读邮件
                 searchCriteria := &imap.SearchCriteria{
@@ -151,7 +155,7 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                 //goland:noinspection SpellCheckingInspection
                 searchMessages, err := c.dialer.Search(searchCriteria, nil).Wait()
                 if err != nil {
-                    panic(err)
+                    panic(errors.Wrap(err))
                 }
                 if len(searchMessages.All) == 0 {
                     log.Println("[INFO - IMAP] 无未读邮件")
@@ -169,7 +173,7 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                     },
                 }
                 if messageBuffers, err := c.dialer.Fetch(seqSet, fetchItems, nil).Collect(); err != nil {
-                    panic(err)
+                    panic(errors.Wrap(err))
                 } else {
                     // 遍历未读邮件
                     for _, msg := range messageBuffers {
@@ -182,7 +186,7 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                 }
                 err = c.dialer.UIDStore(seqSet, flags, nil).Wait()
                 if err != nil {
-                    panic(err)
+                    panic(errors.Wrap(err))
                 }
             }
         }
