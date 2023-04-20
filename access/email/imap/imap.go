@@ -60,7 +60,7 @@ func (c *Client) createDialer() (*imapclient.Client, error) {
 
 // Login 登录
 func (c *Client) login() error {
-    if c.dialer != nil && c.dialer.State() == imap.ConnStateLogout {
+    if c.dialer != nil && c.dialer.State() != imap.ConnStateLogout {
         err := c.close()
         if err != nil {
             if c.config.Debug {
@@ -136,8 +136,10 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                 if err != nil {
                     // 检查客户端状态
                     if c.dialer == nil || c.dialer.State() == imap.ConnStateLogout {
+                        log.Println("[WARNING - IMAP] IMAP 连接被意外关闭，程序将自动重连...")
                         err = c.login()
                         if err != nil {
+                            log.Printf("[ERROR - IMAP] IMAP 重连失败，原因是：%v\n", err)
                             panic(err)
                         }
                         continue

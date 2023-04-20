@@ -66,7 +66,7 @@ func (d *Dispatcher) Listen() error {
                     email := mail.From[0][0]
                     user := store.FindUser(email)
                     if user == nil {
-                        log.Printf("[WRANNING] 邮箱用户 %s<%s> 不是有效用户，跳过\n", mail.From[0][1], mail.From[0][0])
+                        log.Printf("[WARNING] 邮箱用户 %s<%s> 不是有效用户，跳过\n", mail.From[0][1], mail.From[0][0])
                         return
                     }
                     requestId := uuid.NewString()
