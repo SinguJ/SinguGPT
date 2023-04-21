@@ -1,5 +1,10 @@
 package models
 
+import (
+    "bytes"
+    "io"
+)
+
 // TextContent 文本类型内容
 type TextContent struct {
     tag  Tag
@@ -16,9 +21,24 @@ func (t *TextContent) Tag() Tag {
     return t.tag
 }
 
+// ExtName 适合的文件扩展名
+func (t *TextContent) ExtName() string {
+    return ".txt"
+}
+
+// ToBytes 转为字节数组
+func (t *TextContent) ToBytes() []byte {
+    return []byte(t.text)
+}
+
 // ToString 转为字符串
 func (t *TextContent) ToString() string {
     return t.text
+}
+
+// ToReader 转为字节读取流
+func (t *TextContent) ToReader() io.Reader {
+    return bytes.NewBufferString(t.text)
 }
 
 // NewTextContent 构造文本内容

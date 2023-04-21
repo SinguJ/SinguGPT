@@ -1,6 +1,7 @@
 package smtp
 
 import (
+    "fmt"
     "strings"
 
     "github.com/go-gomail/gomail"
@@ -46,16 +47,13 @@ func (p *Client) buildMessage(contents models.Contents, subject string, receiver
     // message.SetHeader("Bcc", message.FormatAddress("", ""), ...)
     message.SetHeader("Subject", subject)
     // 遍历 Contents 中的每一个 Content
-    for _, content := range contents {
-        // 根据 Content 的类型，执行相应的处理方式
-        switch content.Type() {
-        case models.ContentTypeText:
-            addText(message, content.(*models.TextContent))
-        case models.ContentTypeHTML:
-            addHTML(message, content.(*models.HTMLContent))
-        case models.ContentTypeMarkdown:
-            addMarkdown(message, content.(*models.MarkdownContent))
-        default:
+    for index, content := range contents {
+        // 根据 Content 的标记，执行相应的处理方式
+        switch content.Tag() {
+        case models.TagBody:
+            addMessageContent(message, content)
+        case models.TagFile:
+            addAttach(message, fmt.Sprintf("Attach-%d%s", index, content.ExtName()), content)
         }
     }
     // 添加附件

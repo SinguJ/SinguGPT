@@ -1,8 +1,10 @@
 package models
 
 import (
+    "bytes"
     "github.com/gomarkdown/markdown/ast"
     "github.com/gomarkdown/markdown/parser"
+    "io"
 )
 
 // 启用的 Markdown 特性
@@ -47,14 +49,29 @@ func (t *MarkdownContent) Tag() Tag {
     return t.tag
 }
 
+// ExtName 适合的文件扩展名
+func (t *MarkdownContent) ExtName() string {
+    return ".md"
+}
+
 // AST Markdown 语法树
 func (t *MarkdownContent) AST() ast.Node {
     return t.ast
 }
 
+// ToBytes 转为字节数组
+func (t *MarkdownContent) ToBytes() []byte {
+    return []byte(t.markdown)
+}
+
 // ToString 转为字符串
 func (t *MarkdownContent) ToString() string {
     return t.markdown
+}
+
+// ToReader 转为字节读取流
+func (t *MarkdownContent) ToReader() io.Reader {
+    return bytes.NewBufferString(t.markdown)
 }
 
 // NewMarkdownContent 构造 Markdown 内容
