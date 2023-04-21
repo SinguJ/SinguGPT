@@ -37,12 +37,12 @@ func (p *Client) Push(user *models.User, email string, contents models.Contents)
 
 func (p *Client) buildMessage(contents models.Contents, subject string, receiverAddr string, receiverName string) *gomail.Message {
     message := gomail.NewMessage()
+    // 设置邮件主题
+    message.SetHeader("Subject", subject)
     // 设置发件人
     message.SetAddressHeader("From", p.emailConfig.username, p.emailConfig.senderName)
     // 设置收件人
     message.SetAddressHeader("To", strings.ToLower(strings.TrimSpace(receiverAddr)), receiverName)
-    // 设置邮件主题
-    message.SetHeader("Subject", subject)
     // 遍历 Contents 中的每一个 Content
     for index, content := range contents {
         // 根据 Content 的标记，执行相应的处理方式
