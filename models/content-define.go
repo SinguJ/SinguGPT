@@ -31,6 +31,8 @@ const (
     TagBody = "body"
     // TagError 错误
     TagError = "error"
+    // TagFile 文件
+    TagFile = "file"
 )
 
 // Content 内容
