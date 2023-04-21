@@ -4,8 +4,22 @@ import (
     "SinguGPT/ai/openai"
     "SinguGPT/models"
     "SinguGPT/utils"
+    "regexp"
     "strings"
 )
+
+var __front__ = regexp.MustCompile(`(\p{Han}+)([a-zA-Z]+)`)
+var __behind__ = regexp.MustCompile(`([a-zA-Z]+)(\p{Han}+)`)
+
+// 在汉字与英语单词之间添加空格
+func addSpacesBetweenChineseCharactersAndEnglishWords(str string) string {
+    return __front__.ReplaceAllString(__behind__.ReplaceAllString(str, "$1 $2"), "$1 $2")
+}
+
+// 内容优化
+func responseOptimization(resp string) string {
+    return addSpacesBetweenChineseCharactersAndEnglishWords(resp)
+}
 
 func init() {
     RegisterActionFunc(func(sessionId string, _ string, user *models.User, _ models.Contents, contents models.Contents) (models.Contents, error) {
@@ -17,8 +31,12 @@ func init() {
         if err != nil {
             return nil, err
         }
+        // 优化响应内容
+        resp = responseOptimization(resp)
+        markdown := models.NewMarkdownContent(models.TagBody, resp)
         return models.Contents{
-            models.NewTextContent(models.TagBody, resp),
+            markdown,
+            models.NewFileContent("Reply.md", markdown),
         }, nil
     }, "ChatGPT", "GPT3", "GPT-3", "GPT3.0", "GPT-3.0")
 }
