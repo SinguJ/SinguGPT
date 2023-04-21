@@ -1,6 +1,9 @@
 package models
 
-import "SinguGPT/errors"
+import (
+    "SinguGPT/errors"
+    "io"
+)
 
 // ContentType 内容类型
 //goland:noinspection GoNameStartsWithPackageName
@@ -42,8 +45,16 @@ type Content interface {
     Type() ContentType
     // Tag 内容标记
     Tag() Tag
+    // ExtName 适合的文件扩展名
+    // 必须以 '.' 开头，
+    // 无适合的扩展名，可以返回空字符串
+    ExtName() string
+    // ToBytes 转为字节数组
+    ToBytes() []byte
     // ToString 转为字符串
     ToString() string
+    // ToReader 转为字节读取流
+    ToReader() io.Reader
 }
 
 // Contents 一组内容
