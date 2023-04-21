@@ -23,12 +23,6 @@ func (b *BytesContent) Tag() Tag {
     return b.tag
 }
 
-// ExtName 文件扩展名
-// 包含 '.' 前缀
-func (b *BytesContent) ExtName() string {
-    panic("不受支持的方法")
-}
-
 // Len 内容长度
 func (b *BytesContent) Len() int64 {
     return int64(len(b.bytes))

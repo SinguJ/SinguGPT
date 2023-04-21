@@ -1,7 +1,6 @@
 package smtp
 
 import (
-    "fmt"
     "strings"
 
     "github.com/go-gomail/gomail"
@@ -44,13 +43,15 @@ func (p *Client) buildMessage(contents models.Contents, subject string, receiver
     // 设置收件人
     message.SetAddressHeader("To", strings.ToLower(strings.TrimSpace(receiverAddr)), receiverName)
     // 遍历 Contents 中的每一个 Content
-    for index, content := range contents {
+    for _, content := range contents {
         // 根据 Content 的标记，执行相应的处理方式
         switch content.Tag() {
         case models.TagBody:
             addMessageContent(message, content)
         case models.TagFile:
-            addAttach(message, fmt.Sprintf("Attach-%d%s", index, content.ExtName()), content)
+            // Tag 为 File 的 Content 一定是 FileContent
+            fileContent := content.(*models.FileContent)
+            addAttach(message, fileContent.FullName(), content)
         }
     }
     return message

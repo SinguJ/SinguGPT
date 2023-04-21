@@ -23,11 +23,6 @@ func (t *HTMLContent) Tag() Tag {
     return t.tag
 }
 
-// ExtName 适合的文件扩展名
-func (t *HTMLContent) ExtName() string {
-    return ".html"
-}
-
 // Len 内容长度
 func (t *HTMLContent) Len() int64 {
     return int64(len(t.html))

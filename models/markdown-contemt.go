@@ -49,11 +49,6 @@ func (t *MarkdownContent) Tag() Tag {
     return t.tag
 }
 
-// ExtName 适合的文件扩展名
-func (t *MarkdownContent) ExtName() string {
-    return ".md"
-}
-
 // Len 内容长度
 func (t *MarkdownContent) Len() int64 {
     return int64(len(t.markdown))

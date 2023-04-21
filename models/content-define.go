@@ -51,10 +51,6 @@ type Content interface {
     Type() ContentType
     // Tag 内容标记
     Tag() Tag
-    // ExtName 适合的文件扩展名
-    // 必须以 '.' 开头，
-    // 无适合的扩展名，可以返回空字符串
-    ExtName() string
     // Len 内容长度
     Len() int64
     // ToBytes 转为字节数组
