@@ -18,6 +18,8 @@ const (
     ContentTypeHTML = "html"
     // ContentTypeURL 链接
     ContentTypeURL = "url"
+    // ContentTypeBytes 字节数组
+    ContentTypeBytes = "bytes"
 )
 
 // Tag 内容标记
