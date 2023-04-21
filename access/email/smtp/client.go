@@ -51,6 +51,10 @@ func (p *Client) buildMessage(contents models.Contents, subject string, receiver
         switch content.Type() {
         case models.ContentTypeText:
             addText(message, content.(*models.TextContent))
+        case models.ContentTypeHTML:
+            addHTML(message, content.(*models.HTMLContent))
+        case models.ContentTypeMarkdown:
+            addMarkdown(message, content.(*models.MarkdownContent))
         default:
         }
     }
