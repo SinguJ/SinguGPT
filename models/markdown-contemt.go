@@ -40,38 +40,38 @@ type MarkdownContent struct {
 }
 
 // Type 内容类型
-func (t *MarkdownContent) Type() ContentType {
+func (c *MarkdownContent) Type() ContentType {
     return ContentTypeMarkdown
 }
 
 // Tag 内容标记
-func (t *MarkdownContent) Tag() Tag {
-    return t.tag
+func (c *MarkdownContent) Tag() Tag {
+    return c.tag
 }
 
-// ExtName 适合的文件扩展名
-func (t *MarkdownContent) ExtName() string {
-    return ".md"
+// Len 内容长度
+func (c *MarkdownContent) Len() int64 {
+    return int64(len(c.markdown))
 }
 
 // AST Markdown 语法树
-func (t *MarkdownContent) AST() ast.Node {
-    return t.ast
+func (c *MarkdownContent) AST() ast.Node {
+    return c.ast
 }
 
 // ToBytes 转为字节数组
-func (t *MarkdownContent) ToBytes() []byte {
-    return []byte(t.markdown)
+func (c *MarkdownContent) ToBytes() []byte {
+    return []byte(c.markdown)
 }
 
 // ToString 转为字符串
-func (t *MarkdownContent) ToString() string {
-    return t.markdown
+func (c *MarkdownContent) ToString() string {
+    return c.markdown
 }
 
 // ToReader 转为字节读取流
-func (t *MarkdownContent) ToReader() io.Reader {
-    return bytes.NewBufferString(t.markdown)
+func (c *MarkdownContent) ToReader() io.Reader {
+    return bytes.NewBufferString(c.markdown)
 }
 
 // NewMarkdownContent 构造 Markdown 内容

@@ -14,33 +14,33 @@ type HTMLContent struct {
 }
 
 // Type 内容类型
-func (t *HTMLContent) Type() ContentType {
+func (c *HTMLContent) Type() ContentType {
     return ContentTypeHTML
 }
 
 // Tag 内容标记
-func (t *HTMLContent) Tag() Tag {
-    return t.tag
+func (c *HTMLContent) Tag() Tag {
+    return c.tag
 }
 
-// ExtName 适合的文件扩展名
-func (t *HTMLContent) ExtName() string {
-    return ".html"
+// Len 内容长度
+func (c *HTMLContent) Len() int64 {
+    return int64(len(c.html))
 }
 
 // ToBytes 转为字节数组
-func (t *HTMLContent) ToBytes() []byte {
-    return []byte(t.html)
+func (c *HTMLContent) ToBytes() []byte {
+    return []byte(c.html)
 }
 
 // ToString 转为字符串
-func (t *HTMLContent) ToString() string {
-    return t.html
+func (c *HTMLContent) ToString() string {
+    return c.html
 }
 
 // ToReader 转为字节读取流
-func (t *HTMLContent) ToReader() io.Reader {
-    return bytes.NewBufferString(t.html)
+func (c *HTMLContent) ToReader() io.Reader {
+    return bytes.NewBufferString(c.html)
 }
 
 // NewHTMLContent 构造 HTML 内容

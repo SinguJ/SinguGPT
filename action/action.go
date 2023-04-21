@@ -1,52 +1,70 @@
 package action
 
 import (
+    "SinguGPT/errors"
     "log"
     "strings"
 
     "SinguGPT/models"
 )
 
-const DefaultAction = "*"
+// 默认处理器命令
+const defaultActionCommand = "*"
 
+// ActionFunc 处理函数
 //goland:noinspection GoNameStartsWithPackageName
-type ActionFunc func(sessionId string, requestId string, user *models.User, content string) (resp string, err error)
+type ActionFunc func(sessionId string, requestId string, user *models.User, args models.Contents, contents models.Contents) (resp models.Contents, err error)
 
+// Action 处理器
 type Action struct {
-    Keywords []string
+    Commands []string
     Action   ActionFunc
 }
 
+// Actions 处理器注册表
 var Actions = make(map[string]*Action)
 
+// RegisterAction 注册一个处理器
 func RegisterAction(action *Action) {
-    for _, keyword := range action.Keywords {
-        keyword = strings.ToLower(keyword)
-        if Actions[keyword] != nil {
+    for _, command := range action.Commands {
+        command = strings.ToLower(command)
+        if Actions[command] != nil {
             log.Fatalln("存在重复的处理关键字")
         }
-        Actions[keyword] = action
+        Actions[command] = action
     }
 }
 
-func RegisterActionFunc(af ActionFunc, keywords ...string) {
+// RegisterActionFunc 注册一个处理函数
+func RegisterActionFunc(af ActionFunc, commands ...string) {
     RegisterAction(&Action{
-        Keywords: keywords,
+        Commands: commands,
         Action:   af,
     })
 }
 
+// DoAction 执行处理流程
 func DoAction(sessionId string, requestId string, user *models.User, req models.Contents) (resp models.Contents, err error) {
-    keyword := strings.ToLower(strings.TrimSpace(req.MustFindOne(models.TagCommand).ToString()))
+    // 根据 Tag 为 Command 类型的 Content，匹配对应的 Action
+    command := req.MustFindOne(models.TagCommand).ToString()
     var action *Action
-    if action = Actions[keyword]; action == nil {
-        action = Actions[DefaultAction]
+    if action = Actions[command]; action == nil {
+        action = Actions[defaultActionCommand]
+        if action == nil {
+            panic(errors.New("未知指令：%s", command))
+        }
     }
-    _resp, err := action.Action(sessionId, requestId, user, req.MustFindOne(models.TagBody).ToString())
-    if err != nil {
-        return nil, err
+    // 拆分 Command 参数集与普通 Content 数据集
+    var commandArgs models.Contents
+    var contents models.Contents
+    for _, content := range req {
+        if content.Tag() == models.TagCommandArg {
+            commandArgs = append(commandArgs, content)
+        } else {
+            contents = append(contents, content)
+        }
     }
-    return models.Contents{
-        models.NewTextContent(models.TagBody, _resp),
-    }, nil
+    // 执行 Action
+    resp, err = action.Action(sessionId, requestId, user, commandArgs, contents)
+    return
 }
