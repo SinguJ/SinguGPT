@@ -109,6 +109,7 @@ func (d *Dispatcher) Listen() error {
                     resp, err := d.messageHandler(user.ID, requestId, user, contents)
                     if err != nil {
                         resp = models.Contents{
+                            models.NewTextContent(models.TagTitle, "ERROR"),
                             models.NewTextContent(models.TagError, fmt.Sprintf("%v", err)),
                         }
                         log.Printf("[ERROR]--- %s %v", requestId, err)
