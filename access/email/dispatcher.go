@@ -88,8 +88,8 @@ func (d *Dispatcher) Listen() error {
                         case imap.HTML:
                             content = models.NewHTMLContent(models.TagBody, message.Text)
                         }
-                        index = index + 1
                         contents[index] = content
+                        index = index + 1
                     }
                     // 处理 IMAP 接收到的附件
                     for _, attache := range mail.Attaches {
@@ -103,8 +103,8 @@ func (d *Dispatcher) Listen() error {
                         case imap.Other:
                             content = models.NewByteContent(models.TagBody, attache.Bytes)
                         }
-                        index = index + 1
                         contents[index] = models.NewFileContent(attache.Filename, content)
+                        index = index + 1
                     }
                     resp, err := d.messageHandler(user.ID, requestId, user, contents)
                     if err != nil {
