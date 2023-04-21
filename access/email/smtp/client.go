@@ -28,13 +28,13 @@ type Client struct {
     emailConfig *EmailConfig
 }
 
-func (p *Client) Push(user *models.User, email string, content models.Content) error {
-    message := p.buildMessage(content, p.emailConfig.subject, email, user.Name)
+func (p *Client) Push(user *models.User, email string, contents models.Contents) error {
+    message := p.buildMessage(contents, p.emailConfig.subject, email, user.Name)
     dialer := p.createDialer()
     return dialer.DialAndSend(message)
 }
 
-func (p *Client) buildMessage(content models.Content, subject string, receiverAddr string, receiverName string) *gomail.Message {
+func (p *Client) buildMessage(contents models.Contents, subject string, receiverAddr string, receiverName string) *gomail.Message {
     message := gomail.NewMessage()
     // 设置发件人
     message.SetAddressHeader("From", p.emailConfig.username, p.emailConfig.senderName)
@@ -45,7 +45,15 @@ func (p *Client) buildMessage(content models.Content, subject string, receiverAd
     // 设置密送人
     // message.SetHeader("Bcc", message.FormatAddress("", ""), ...)
     message.SetHeader("Subject", subject)
-    message.AddAlternative("text/plain", content.ToString())
+    // 遍历 Contents 中的每一个 Content
+    for _, content := range contents {
+        // 根据 Content 的类型，执行相应的处理方式
+        switch content.Type() {
+        case models.ContentTypeText:
+            addText(message, content.(*models.TextContent))
+        default:
+        }
+    }
     // 添加附件
     // message.Attach("")
     return message

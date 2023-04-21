@@ -82,7 +82,7 @@ func (d *Dispatcher) Listen() error {
                         }
                         log.Printf("[ERROR]--- %s %v", requestId, err)
                     }
-                    err = d.smtpClient.Push(user, email, resp[0])
+                    err = d.smtpClient.Push(user, email, resp)
                     if err != nil {
                         log.Printf("[ERROR]--- %s %v", requestId, err)
                     }
