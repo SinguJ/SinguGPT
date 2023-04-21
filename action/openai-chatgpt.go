@@ -17,8 +17,10 @@ func init() {
         if err != nil {
             return nil, err
         }
+        markdown := models.NewMarkdownContent(models.TagBody, resp)
         return models.Contents{
-            models.NewMarkdownContent(models.TagBody, resp),
+            markdown,
+            models.NewFileContent("Reply.md", markdown),
         }, nil
     }, "ChatGPT", "GPT3", "GPT-3", "GPT3.0", "GPT-3.0")
 }
