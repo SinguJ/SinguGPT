@@ -1,6 +1,9 @@
 package models
 
-import "SinguGPT/errors"
+import (
+    "SinguGPT/errors"
+    "io"
+)
 
 // ContentType 内容类型
 //goland:noinspection GoNameStartsWithPackageName
@@ -15,6 +18,12 @@ const (
     ContentTypeHTML = "html"
     // ContentTypeURL 链接
     ContentTypeURL = "url"
+    // ContentTypeBytes 字节数组
+    ContentTypeBytes = "bytes"
+    // ContentTypeFile 文件
+    ContentTypeFile = "file"
+    // ContentTypeUnknown 未知内容类型
+    ContentTypeUnknown = "unknown"
 )
 
 // Tag 内容标记
@@ -31,6 +40,8 @@ const (
     TagBody = "body"
     // TagError 错误
     TagError = "error"
+    // TagFile 文件
+    TagFile = "file"
 )
 
 // Content 内容
@@ -40,8 +51,14 @@ type Content interface {
     Type() ContentType
     // Tag 内容标记
     Tag() Tag
+    // Len 内容长度
+    Len() int64
+    // ToBytes 转为字节数组
+    ToBytes() []byte
     // ToString 转为字符串
     ToString() string
+    // ToReader 转为字节读取流
+    ToReader() io.Reader
 }
 
 // Contents 一组内容

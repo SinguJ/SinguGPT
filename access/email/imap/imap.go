@@ -107,6 +107,22 @@ func (c *Client) close() error {
     return nil
 }
 
+// 尝试修复错误
+func (c *Client) attemptToFixErrors(err error) {
+    // 检查客户端状态
+    if c.dialer == nil || c.dialer.State() == imap.ConnStateLogout {
+        log.Println("[WARNING - IMAP] IMAP 连接被意外关闭，程序将自动重连...")
+        err := c.login()
+        if err != nil {
+            log.Printf("[ERROR - IMAP] IMAP 重连失败，原因是：%v\n", err)
+            panic(errors.Wrap(err))
+        }
+        return
+    }
+    log.Printf("[ERROR - IMAP] IMAP 重连失败，原因是：%v\n", err)
+    panic(errors.Wrap(err))
+}
+
 func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration time.Duration) error {
     go func() {
         defer func() {
@@ -136,17 +152,9 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                 // 选择收件箱
                 _, err = c.dialer.Select("INBOX", nil).Wait()
                 if err != nil {
-                    // 检查客户端状态
-                    if c.dialer == nil || c.dialer.State() == imap.ConnStateLogout {
-                        log.Println("[WARNING - IMAP] IMAP 连接被意外关闭，程序将自动重连...")
-                        err = c.login()
-                        if err != nil {
-                            log.Printf("[ERROR - IMAP] IMAP 重连失败，原因是：%v\n", err)
-                            panic(errors.Wrap(err))
-                        }
-                        continue
-                    }
-                    panic(errors.Wrap(err))
+                    // 尝试修复错误
+                    c.attemptToFixErrors(err)
+                    continue
                 }
                 // 使用 UNSEEN 搜索条件获取未读邮件
                 searchCriteria := &imap.SearchCriteria{
@@ -155,7 +163,9 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                 //goland:noinspection SpellCheckingInspection
                 searchMessages, err := c.dialer.Search(searchCriteria, nil).Wait()
                 if err != nil {
-                    panic(errors.Wrap(err))
+                    // 尝试修复错误
+                    c.attemptToFixErrors(err)
+                    continue
                 }
                 if len(searchMessages.All) == 0 {
                     log.Println("[INFO - IMAP] 无未读邮件")
@@ -173,7 +183,9 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                     },
                 }
                 if messageBuffers, err := c.dialer.Fetch(seqSet, fetchItems, nil).Collect(); err != nil {
-                    panic(errors.Wrap(err))
+                    // 尝试修复错误
+                    c.attemptToFixErrors(err)
+                    continue
                 } else {
                     // 遍历未读邮件
                     for _, msg := range messageBuffers {
@@ -186,7 +198,9 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                 }
                 err = c.dialer.UIDStore(seqSet, flags, nil).Wait()
                 if err != nil {
-                    panic(errors.Wrap(err))
+                    // 尝试修复错误
+                    c.attemptToFixErrors(err)
+                    continue
                 }
             }
         }

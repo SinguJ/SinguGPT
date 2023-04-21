@@ -3,13 +3,15 @@ package action
 import (
     "SinguGPT/models"
     "SinguGPT/store"
+    "SinguGPT/utils"
 )
 
 func init() {
     // 3.  邮件主题为 "NewSession" 或 "新会话"，邮件内容为 "ChatGPT"
     // 当您需要创建一个新的 ChatGPT 会话时，请将邮件主题设置为 "NewSession" 或 "新会话"，并将邮件内容设置为 "ChatGPT"。程序将为您创建一个全新的会话。
-    RegisterActionFunc(func(sessionId string, requestId string, user *models.User, content string) (resp string, err error) {
-        return stringFormat(`
+    RegisterActionFunc(func(_ string, _ string, _ *models.User, _ models.Contents, _ models.Contents) (models.Contents, error) {
+        return models.Contents{
+            models.NewTextContent(models.TagBody, utils.StringFormat(`
 亲爱的用户，
 
 欢迎使用我们的 {AppName} 程序！为了帮助您更好地使用本程序，我们为您准备了以下简单的操作指南。请仔细阅读以下内容，以便了解如何与我们的 GPT 程序进行互动。
@@ -30,6 +32,7 @@ func init() {
 希望这些信息能够帮助您更好地使用我们的邮件版 GPT 程序。如果您有任何疑问，请随时联系我们，我们将竭诚为您服务。祝您使用愉快！
 
 {AppName} 团队
-`, "{AppName}", store.Config.App.Name, "{AppEmail}", store.Config.Email.IMAP.UserName), nil
-    }, "help", "帮助", DefaultAction)
+`, "{AppName}", store.Config.App.Name, "{AppEmail}", store.Config.Email.IMAP.UserName)),
+        }, nil
+    }, "help", "帮助", defaultActionCommand)
 }
