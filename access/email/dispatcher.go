@@ -71,11 +71,42 @@ func (d *Dispatcher) Listen() error {
                     }
                     requestId := uuid.NewString()
                     log.Printf("[INFO]>>> %s 处理用户 %s<%s> 的请求\n", requestId, user.Name, email)
-                    req := models.Contents{
-                        models.NewTextContent(models.TagCommand, mail.Subject),
-                        models.NewTextContent(models.TagBody, mail.Contents[0].Text),
+                    // 解析命令
+                    commands := parseCommand(mail.Subject)
+                    // 创建 Contents
+                    contents := make(models.Contents, len(commands)+len(mail.Contents)+len(mail.Attaches))
+                    copy(contents[:len(commands)], commands)
+                    // 索引
+                    index := len(commands)
+                    // 处理 IMAP 接收到的邮件内容
+                    for _, message := range mail.Contents {
+                        // 根据消息的内容类型，转换为对应的 Content 对象
+                        var content models.Content
+                        switch message.Type {
+                        case imap.Text:
+                            content = models.NewTextContent(models.TagBody, message.Text)
+                        case imap.HTML:
+                            content = models.NewHTMLContent(models.TagBody, message.Text)
+                        }
+                        index = index + 1
+                        contents[index] = content
                     }
-                    resp, err := d.messageHandler(user.ID, requestId, user, req)
+                    // 处理 IMAP 接收到的附件
+                    for _, attache := range mail.Attaches {
+                        // 根据附件的内容类型，转换为对应的 Content 对象
+                        var content models.Content
+                        switch attache.Type {
+                        case imap.Text:
+                            content = models.NewTextContent(models.TagBody, string(attache.Bytes))
+                        case imap.HTML:
+                            content = models.NewHTMLContent(models.TagBody, string(attache.Bytes))
+                        case imap.Other:
+                            content = models.NewByteContent(models.TagBody, attache.Bytes)
+                        }
+                        index = index + 1
+                        contents[index] = models.NewFileContent(attache.Filename, content)
+                    }
+                    resp, err := d.messageHandler(user.ID, requestId, user, contents)
                     if err != nil {
                         resp = models.Contents{
                             models.NewTextContent(models.TagError, fmt.Sprintf("%v", err)),
