@@ -41,10 +41,7 @@ func (p *Client) buildMessage(contents models.Contents, subject string, receiver
     message.SetAddressHeader("From", p.emailConfig.username, p.emailConfig.senderName)
     // 设置收件人
     message.SetAddressHeader("To", strings.ToLower(strings.TrimSpace(receiverAddr)), receiverName)
-    // 设置抄送人
-    // message.SetHeader("Cc", message.FormatAddress("", ""), ...)
-    // 设置密送人
-    // message.SetHeader("Bcc", message.FormatAddress("", ""), ...)
+    // 设置邮件主题
     message.SetHeader("Subject", subject)
     // 遍历 Contents 中的每一个 Content
     for index, content := range contents {
@@ -56,8 +53,6 @@ func (p *Client) buildMessage(contents models.Contents, subject string, receiver
             addAttach(message, fmt.Sprintf("Attach-%d%s", index, content.ExtName()), content)
         }
     }
-    // 添加附件
-    // message.Attach("")
     return message
 }
 
