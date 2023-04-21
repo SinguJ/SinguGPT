@@ -18,7 +18,7 @@ func init() {
             return nil, err
         }
         return models.Contents{
-            models.NewTextContent(models.TagBody, resp),
+            models.NewMarkdownContent(models.TagBody, resp),
         }, nil
     }, "ChatGPT", "GPT3", "GPT-3", "GPT3.0", "GPT-3.0")
 }
