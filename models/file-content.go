@@ -69,62 +69,62 @@ type FileContent struct {
 }
 
 // Type 内容的类型
-func (f *FileContent) Type() ContentType {
+func (c *FileContent) Type() ContentType {
     return ContentTypeFile
 }
 
 // FileType 文件类型
-func (f *FileContent) FileType() ContentType {
-    if f.content != nil {
-        return f.content.Type()
+func (c *FileContent) FileType() ContentType {
+    if c.content != nil {
+        return c.content.Type()
     }
-    return matchContentType(f.extName)
+    return matchContentType(c.extName)
 }
 
 // Tag 内容标记
-func (f *FileContent) Tag() Tag {
+func (c *FileContent) Tag() Tag {
     return TagFile
 }
 
 // Path 文件路径
-func (f *FileContent) Path() string {
-    return fmt.Sprintf("%s/%s%s", f.dirPath, f.name, f.extName)
+func (c *FileContent) Path() string {
+    return fmt.Sprintf("%s/%s%s", c.dirPath, c.name, c.extName)
 }
 
 // DirPath 文件所在目录的路径
-func (f *FileContent) DirPath() string {
-    return f.dirPath
+func (c *FileContent) DirPath() string {
+    return c.dirPath
 }
 
 // Name 文件名称
 // 不包含文件扩展名
-func (f *FileContent) Name() string {
-    return f.name
+func (c *FileContent) Name() string {
+    return c.name
 }
 
 // FullName 完整文件名称
 // 包含文件扩展名
-func (f *FileContent) FullName() string {
-    return fmt.Sprintf("%s%s", f.name, f.extName)
+func (c *FileContent) FullName() string {
+    return fmt.Sprintf("%s%s", c.name, c.extName)
 }
 
 // ExtName 文件扩展名
 // 包含 '.' 前缀
-func (f *FileContent) ExtName() string {
-    return f.extName
+func (c *FileContent) ExtName() string {
+    return c.extName
 }
 
 // Len 内容长度
-func (f *FileContent) Len() int64 {
-    return f.size
+func (c *FileContent) Len() int64 {
+    return c.size
 }
 
 // ToBytes 转为字节数组
-func (f *FileContent) ToBytes() []byte {
-    if f.content != nil {
-        return f.content.ToBytes()
+func (c *FileContent) ToBytes() []byte {
+    if c.content != nil {
+        return c.content.ToBytes()
     }
-    byteArr, err := os.ReadFile(f.Path())
+    byteArr, err := os.ReadFile(c.Path())
     if err != nil {
         panic(err)
     }
@@ -132,19 +132,19 @@ func (f *FileContent) ToBytes() []byte {
 }
 
 // ToString 转为字符串
-func (f *FileContent) ToString() string {
-    if f.content != nil {
-        return f.content.ToString()
+func (c *FileContent) ToString() string {
+    if c.content != nil {
+        return c.content.ToString()
     }
-    return string(f.ToBytes())
+    return string(c.ToBytes())
 }
 
 // ToReader 转为字节读取流
-func (f *FileContent) ToReader() io.Reader {
-    if f.content != nil {
-        return f.content.ToReader()
+func (c *FileContent) ToReader() io.Reader {
+    if c.content != nil {
+        return c.content.ToReader()
     }
-    file, err := os.Open(f.Path())
+    file, err := os.Open(c.Path())
     if err != nil {
         panic(err)
     }

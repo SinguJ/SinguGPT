@@ -14,33 +14,33 @@ type BytesContent struct {
 }
 
 // Type 内容的类型
-func (b *BytesContent) Type() ContentType {
+func (c *BytesContent) Type() ContentType {
     return ContentTypeBytes
 }
 
 // Tag 内容标记
-func (b *BytesContent) Tag() Tag {
-    return b.tag
+func (c *BytesContent) Tag() Tag {
+    return c.tag
 }
 
 // Len 内容长度
-func (b *BytesContent) Len() int64 {
-    return int64(len(b.bytes))
+func (c *BytesContent) Len() int64 {
+    return int64(len(c.bytes))
 }
 
 // ToBytes 转为字节数组
-func (b *BytesContent) ToBytes() []byte {
-    return b.bytes
+func (c *BytesContent) ToBytes() []byte {
+    return c.bytes
 }
 
 // ToString 转为字符串
-func (b *BytesContent) ToString() string {
-    return string(b.bytes)
+func (c *BytesContent) ToString() string {
+    return string(c.bytes)
 }
 
 // ToReader 转为字节读取流
-func (b *BytesContent) ToReader() io.Reader {
-    return bytes.NewReader(b.bytes)
+func (c *BytesContent) ToReader() io.Reader {
+    return bytes.NewReader(c.bytes)
 }
 
 // NewByteContent 创建字节数组类型的 Content 对象
