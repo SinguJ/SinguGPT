@@ -29,7 +29,15 @@ type Client struct {
 }
 
 func (p *Client) Push(user *models.User, email string, contents models.Contents) error {
-    message := p.buildMessage(contents, p.emailConfig.subject, email, user.Name)
+    // 主题
+    subject := p.emailConfig.subject
+    // 搜索 Tag 为 TagTitle 的 Content
+    if titleContent, err := contents.FindOne(models.TagTitle); err != nil {
+        return err
+    } else if titleContent != nil {
+        subject = titleContent.ToString()
+    }
+    message := p.buildMessage(contents, subject, email, user.Name)
     dialer := p.createDialer()
     return dialer.DialAndSend(message)
 }
