@@ -26,6 +26,11 @@ func (t *TextContent) ExtName() string {
     return ".txt"
 }
 
+// Len 内容长度
+func (t *TextContent) Len() int64 {
+    return int64(len(t.text))
+}
+
 // ToBytes 转为字节数组
 func (t *TextContent) ToBytes() []byte {
     return []byte(t.text)

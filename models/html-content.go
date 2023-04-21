@@ -28,6 +28,11 @@ func (t *HTMLContent) ExtName() string {
     return ".html"
 }
 
+// Len 内容长度
+func (t *HTMLContent) Len() int64 {
+    return int64(len(t.html))
+}
+
 // ToBytes 转为字节数组
 func (t *HTMLContent) ToBytes() []byte {
     return []byte(t.html)

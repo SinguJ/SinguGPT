@@ -54,6 +54,11 @@ func (t *MarkdownContent) ExtName() string {
     return ".md"
 }
 
+// Len 内容长度
+func (t *MarkdownContent) Len() int64 {
+    return int64(len(t.markdown))
+}
+
 // AST Markdown 语法树
 func (t *MarkdownContent) AST() ast.Node {
     return t.ast

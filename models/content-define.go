@@ -49,6 +49,8 @@ type Content interface {
     // 必须以 '.' 开头，
     // 无适合的扩展名，可以返回空字符串
     ExtName() string
+    // Len 内容长度
+    Len() int64
     // ToBytes 转为字节数组
     ToBytes() []byte
     // ToString 转为字符串
