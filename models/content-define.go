@@ -20,6 +20,10 @@ const (
     ContentTypeURL = "url"
     // ContentTypeBytes 字节数组
     ContentTypeBytes = "bytes"
+    // ContentTypeFile 文件
+    ContentTypeFile = "file"
+    // ContentTypeUnknown 未知内容类型
+    ContentTypeUnknown = "unknown"
 )
 
 // Tag 内容标记
