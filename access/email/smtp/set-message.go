@@ -2,6 +2,7 @@ package smtp
 
 import (
     "github.com/go-gomail/gomail"
+    "io"
 
     "SinguGPT/models"
 )
@@ -34,4 +35,13 @@ func addMessageContent(message *gomail.Message, content models.Content) {
         addMarkdown(message, content.(*models.MarkdownContent))
     default:
     }
+}
+
+// 添加附件
+func addAttach(message *gomail.Message, filename string, content models.Content) {
+    reader := content.ToReader()
+    message.Attach(filename, gomail.SetCopyFunc(func(writer io.Writer) error {
+        _, err := io.Copy(writer, reader)
+        return err
+    }))
 }
