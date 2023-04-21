@@ -60,7 +60,12 @@ func (p *Client) buildMessage(contents models.Contents, subject string, receiver
             // Tag 为 File 的 Content 一定是 FileContent
             fileContent := content.(*models.FileContent)
             addAttach(message, fileContent.FullName(), content)
+        default:
         }
+    }
+    // 将所有标记为 TagError 的内容写入 Message 中
+    for _, errorContent := range contents.Find(models.TagError) {
+        addMessageContent(message, errorContent)
     }
     return message
 }
