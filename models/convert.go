@@ -18,7 +18,6 @@ const htmlFlags = 0 |
     html.SmartypantsLatexDashes |
     html.SmartypantsAngledQuotes |
     html.SmartypantsQuotesNBSP |
-    html.TOC |
     html.LazyLoadImages
 
 const htmlFormat = `<!DOCTYPE html>
