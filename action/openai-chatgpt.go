@@ -1,15 +1,16 @@
 package action
 
 import (
+    "regexp"
+    "strings"
+
     "SinguGPT/ai/openai"
     "SinguGPT/models"
     "SinguGPT/utils"
-    "regexp"
-    "strings"
 )
 
-var __front__ = regexp.MustCompile(`(\p{Han}+)([a-zA-Z]+)`)
-var __behind__ = regexp.MustCompile(`([a-zA-Z]+)(\p{Han}+)`)
+var __front__ = regexp.MustCompile(`(\p{Han}+)(\W+)`)
+var __behind__ = regexp.MustCompile(`(\W+)(\p{Han}+)`)
 
 // 在汉字与英语单词之间添加空格
 func addSpacesBetweenChineseCharactersAndEnglishWords(str string) string {
@@ -36,7 +37,7 @@ func init() {
         markdown := models.NewMarkdownContent(models.TagBody, resp)
         return models.Contents{
             markdown,
-            models.NewFileContent("Reply.md", markdown),
+            models.NewFileContent("原文.md", markdown),
         }, nil
     }, "ChatGPT", "GPT3", "GPT-3", "GPT3.0", "GPT-3.0")
 }

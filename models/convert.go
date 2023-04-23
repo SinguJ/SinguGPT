@@ -16,9 +16,6 @@ const htmlFlags = 0 |
     html.SmartypantsFractions |
     html.SmartypantsDashes |
     html.SmartypantsLatexDashes |
-    html.SmartypantsAngledQuotes |
-    html.SmartypantsQuotesNBSP |
-    html.TOC |
     html.LazyLoadImages
 
 const htmlFormat = `<!DOCTYPE html>
@@ -28,8 +25,8 @@ const htmlFormat = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown-light.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/base16/atelier-seaside-light.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"></script>
 <script type="text/javascript">hljs.highlightAll();</script>
 <style>
 	.markdown-body {
