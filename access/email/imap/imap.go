@@ -182,6 +182,7 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                         Specifier: imap.PartSpecifierText,
                     },
                 }
+                var mailSeqSet imap.SeqSet
                 if messageBuffers, err := c.dialer.Fetch(seqSet, fetchItems, nil).Collect(); err != nil {
                     // 尝试修复错误
                     c.attemptToFixErrors(err)
@@ -189,6 +190,7 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                 } else {
                     // 遍历未读邮件
                     for _, msg := range messageBuffers {
+                        mailSeqSet.AddNum(msg.UID)
                         channel <- readMail(msg)
                     }
                 }
@@ -196,7 +198,7 @@ func (c *Client) Listen(channel chan *Mail, errorChannel chan error, duration ti
                 flags := &imap.StoreFlags{
                     Flags: []imap.Flag{imap.FlagSeen},
                 }
-                err = c.dialer.UIDStore(seqSet, flags, nil).Wait()
+                err = c.dialer.UIDStore(mailSeqSet, flags, nil).Wait()
                 if err != nil {
                     // 尝试修复错误
                     c.attemptToFixErrors(err)
