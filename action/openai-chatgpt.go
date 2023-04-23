@@ -37,7 +37,7 @@ func init() {
         markdown := models.NewMarkdownContent(models.TagBody, resp)
         return models.Contents{
             markdown,
-            models.NewFileContent("Reply.md", markdown),
+            models.NewFileContent("原文.md", markdown),
         }, nil
     }, "ChatGPT", "GPT3", "GPT-3", "GPT3.0", "GPT-3.0")
 }
