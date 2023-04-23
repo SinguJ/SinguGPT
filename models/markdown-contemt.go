@@ -22,7 +22,6 @@ const markdownExtensions = 0 |
     parser.AutoHeadingIDs |
     parser.BackslashLineBreak |
     parser.DefinitionLists |
-    parser.MathJax |
     parser.Attributes |
     parser.SuperSubscript |
     parser.EmptyLinesBreakList |

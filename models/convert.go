@@ -16,8 +16,6 @@ const htmlFlags = 0 |
     html.SmartypantsFractions |
     html.SmartypantsDashes |
     html.SmartypantsLatexDashes |
-    html.SmartypantsAngledQuotes |
-    html.SmartypantsQuotesNBSP |
     html.LazyLoadImages
 
 const htmlFormat = `<!DOCTYPE html>
