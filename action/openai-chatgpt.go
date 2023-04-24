@@ -9,17 +9,30 @@ import (
     "SinguGPT/utils"
 )
 
-var __front__ = regexp.MustCompile(`(\p{Han}+)(\W+)`)
-var __behind__ = regexp.MustCompile(`(\W+)(\p{Han}+)`)
-
-// 在汉字与英语单词之间添加空格
-func addSpacesBetweenChineseCharactersAndEnglishWords(str string) string {
-    return __front__.ReplaceAllString(__behind__.ReplaceAllString(str, "$1 $2"), "$1 $2")
+// 正则规则
+var regexRules = []struct {
+    pattern *regexp.Regexp
+    replace string
+}{
+    // 在英文字符与汉字之间插入空格
+    {regexp.MustCompile(`([a-zA-Z])(\p{Han})`), "$1 $2"},
+    {regexp.MustCompile(`(\p{Han})([a-zA-Z])`), "$1 $2"},
+    // 在英文符号与汉字之间插入空格
+    {regexp.MustCompile(`([[:punct:]])(\p{Han})`), "$1 $2"},
+    {regexp.MustCompile(`(\p{Han})([[:punct:]])`), "$1 $2"},
+    // 在数字与汉字之间插入空格
+    {regexp.MustCompile(`([0-9])(\p{Han})`), "$1 $2"},
+    {regexp.MustCompile(`(\p{Han})([0-9])`), "$1 $2"},
 }
 
 // 内容优化
-func responseOptimization(resp string) string {
-    return addSpacesBetweenChineseCharactersAndEnglishWords(resp)
+func responseOptimization(input string) string {
+    // 通过正则表达式规则集优化输入的 Markdown 原文
+    output := input
+    for _, rule := range regexRules {
+        output = rule.pattern.ReplaceAllString(output, rule.replace)
+    }
+    return output
 }
 
 func init() {
