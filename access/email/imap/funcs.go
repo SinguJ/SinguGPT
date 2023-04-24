@@ -33,6 +33,9 @@ func getBody(msg *imapclient.FetchMessageBuffer) []byte {
 }
 
 func readBody(msg *imapclient.FetchMessageBuffer) ([]*Content, []*Attach) {
+    if msg.BodySection == nil {
+        return []*Content{}, []*Attach{}
+    }
     bodyStructure := msg.BodyStructure.(*imap.BodyStructureMultiPart)
     boundary := bodyStructure.Extended.Params["boundary"]
     //goland:noinspection SpellCheckingInspection
