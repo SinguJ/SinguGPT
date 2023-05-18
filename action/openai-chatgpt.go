@@ -1,7 +1,8 @@
 package action
 
 import (
-    "regexp"
+    "SinguGPT/store"
+    "fmt"
     "strings"
 
     "SinguGPT/ai/openai"
@@ -9,48 +10,59 @@ import (
     "SinguGPT/utils"
 )
 
-// 正则规则
-var regexRules = []struct {
-    pattern *regexp.Regexp
-    replace string
-}{
-    // 在英文字符与汉字之间插入空格
-    {regexp.MustCompile(`([a-zA-Z])(\p{Han})`), "$1 $2"},
-    {regexp.MustCompile(`(\p{Han})([a-zA-Z])`), "$1 $2"},
-    // 在英文符号与汉字之间插入空格
-    {regexp.MustCompile(`([[:punct:]])(\p{Han})`), "$1 $2"},
-    {regexp.MustCompile(`(\p{Han})([[:punct:]])`), "$1 $2"},
-    // 在数字与汉字之间插入空格
-    {regexp.MustCompile(`([0-9])(\p{Han})`), "$1 $2"},
-    {regexp.MustCompile(`(\p{Han})([0-9])`), "$1 $2"},
-}
-
-// 内容优化
-func responseOptimization(input string) string {
-    // 通过正则表达式规则集优化输入的 Markdown 原文
-    output := input
-    for _, rule := range regexRules {
-        output = rule.pattern.ReplaceAllString(output, rule.replace)
+func verifyPermission(perm string, user *models.User) bool {
+    // 获取用户具有的角色
+    role := user.Role
+    // 判断该角色是否具有该权限
+    for _, _perm := range role.Perms {
+        if _perm == perm {
+            return true
+        }
     }
-    return output
+    return false
 }
 
-func init() {
+func toOpenAiModel(model models.OpenAiModel) openai.Model {
+    switch model {
+    case models.GPT3Dot5:
+        return openai.GPT3Dot5
+    case models.GPT4:
+        return openai.GPT4
+    default:
+        panic(fmt.Sprintf("不支持的模型名称：%s", model))
+    }
+}
+
+func newOpenAiAction(client *openai.Client, perm string, model openai.Model, commands ...string) {
     RegisterActionFunc(func(sessionId string, _ string, user *models.User, _ models.Contents, contents models.Contents) (models.Contents, error) {
+        // 校验该用户是否具有对该模型的使用权限
+        if !verifyPermission(perm, user) {
+            return nil, ErrorNoPermission
+        }
+
         content := strings.Join(utils.Map(contents.Find(models.TagBody), func(content models.Content) string {
             return content.ToString()
         }), "\n")
-        req := openai.NewChatRequest(sessionId, user, content)
-        resp, err := openai.Chat(req)
+        req := openai.NewChatRequest(model, sessionId, user, content)
+        resp, err := client.Chat(req)
         if err != nil {
             return nil, err
         }
         // 优化响应内容
-        resp = responseOptimization(resp)
+        resp = utils.BeautifulMarkdown(resp)
         markdown := models.NewMarkdownContent(models.TagBody, resp)
         return models.Contents{
             markdown,
             models.NewFileContent("原文.md", markdown),
         }, nil
-    }, "ChatGPT", "GPT3", "GPT-3", "GPT3.0", "GPT-3.0")
+    }, commands...)
+}
+
+func init() {
+    for _, config := range store.Config.OpenAI {
+        client := openai.NewClient(config.OrgId, config.ApiKey)
+        for _, model := range config.Models {
+            newOpenAiAction(client, config.ID, toOpenAiModel(model), config.Commands...)
+        }
+    }
 }

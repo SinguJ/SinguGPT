@@ -1,5 +1,7 @@
 github.com/emersion/go-imap/v2 v2.0.0-alpha.3 h1:hkz7bM4DXJzRqkH9sp50u3pbdhNesM2AQcPtG06PnNc=
 github.com/emersion/go-imap/v2 v2.0.0-alpha.3/go.mod h1:NQQIs7aGbZC7CuvEp9yfidW2TCstC3rUIo4k8LbqxzA=
+github.com/emersion/go-imap/v2 v2.0.0-alpha.4 h1:zaSLXl0TmWMg/ddcn9nwGD0scb8j+Rk7Yul/oVFrYVw=
+github.com/emersion/go-imap/v2 v2.0.0-alpha.4/go.mod h1:NQQIs7aGbZC7CuvEp9yfidW2TCstC3rUIo4k8LbqxzA=
 github.com/emersion/go-message v0.16.0 h1:uZLz8ClLv3V5fSFF/fFdW9jXjrZkXIpE1Fn8fKx7pO4=
 github.com/emersion/go-message v0.16.0/go.mod h1:pDJDgf/xeUIF+eicT6B/hPX/ZbEorKkUMPOxrPVG2eQ=
 github.com/emersion/go-sasl v0.0.0-20220912192320-0145f2c60ead h1:fI1Jck0vUrXT8bnphprS1EoVRe2Q5CKCX8iDlpqjQ/Y=

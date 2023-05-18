@@ -14,7 +14,7 @@ import (
 var accessMappingTable = make(map[models.AccessMethod]func())
 
 // 启用电子邮件接入
-func accessEmail () {
+func accessEmail() {
     // 创建邮件调度器
     emailDispatcher := email.NewDispatcher()
     err := emailDispatcher.OnMessageReceive(action.DoAction)
@@ -28,7 +28,7 @@ func accessEmail () {
     }
 }
 
-func init () {
+func init() {
     // 添加邮箱接入方式
     accessMappingTable[models.AccessMethodEmail] = accessEmail
 }
@@ -42,7 +42,7 @@ func main() {
         }
     }()
     // 加载并监听用户配置文件
-    store.LoadAndWatchUsers()
+    store.LoadAndWatchRolesAndUsers()
     // 初始化接入方式
     for _, accessMethod := range store.Config.App.AccessMethods {
         if bootFunc := accessMappingTable[accessMethod]; bootFunc != nil {

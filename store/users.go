@@ -14,16 +14,23 @@ import (
 
 var users []*models.User
 
+var roles []*models.Role
+
 var userMapping map[string]*models.User
 
-func loadUsers(path string) error {
-    // 加载新用户数据
+func loadRolesAndUsers(path string) error {
+    // 加载新用户与角色数据
     userConfig := models.UserConfig{}
     err := loadYaml(path, &userConfig)
     if err != nil {
         return err
     }
 
+    // 构建角色映射
+    var _roleMapping = make(map[string]*models.Role)
+    for _, role := range userConfig.Roles {
+        _roleMapping[role.Name] = role
+    }
     // 构建用户映射及用户数组
     var _users = make([]*models.User, len(userConfig.Users))
     var _userMapping = make(map[string]*models.User)
@@ -31,6 +38,7 @@ func loadUsers(path string) error {
     for userId := range userConfig.Users {
         user := userConfig.Users[userId]
         user.ID = userId
+        user.Role = _roleMapping[user.RoleName]
         _users[index] = user
         index++
         for _, email := range user.Emails {
@@ -39,27 +47,35 @@ func loadUsers(path string) error {
         }
     }
 
-    // 替换新用户数据
+    // 替换新用户及角色数据
     users = _users
     userMapping = _userMapping
+    roles = userConfig.Roles
 
-    // 遍历用户集
-    var user *models.User
     var buff bytes.Buffer
-    ForeachUsers(func(_user *models.User) {
-        if user == nil {
-            user = _user
+    // 遍历角色集
+    buff.WriteString("角色集：{{%%\n")
+    ForeachRoles(func(role *models.Role) {
+        buff.WriteString(fmt.Sprintf("  %s:\n", role.Name))
+        for _, perm := range role.Perms {
+            buff.WriteString(fmt.Sprintf("      - %s\n", perm))
         }
-        buff.WriteString(fmt.Sprintf("  %s:\n", _user.Name))
-        for _, email := range _user.Emails {
+    })
+    buff.WriteString("%%}}\n")
+    // 遍历用户集
+    buff.WriteString("用户集：{{%%\n")
+    ForeachUsers(func(user *models.User) {
+        buff.WriteString(fmt.Sprintf("  %s:\n", user.Name))
+        for _, email := range user.Emails {
             buff.WriteString(fmt.Sprintf("      - %s\n", email))
         }
     })
-    log.Printf("[INFO - USERS] 用户集：{{%%%%\n%s\n%%%%}}\n", buff.String())
+    buff.WriteString("%%}}\n")
+    log.Printf("[INFO - USERS] \n%s", buff.String())
     return nil
 }
 
-func LoadAndWatchUsers() {
+func LoadAndWatchRolesAndUsers() {
     // 创建文件系统监视器
     watcher, err := fsnotify.NewWatcher()
     if err != nil {
@@ -92,7 +108,7 @@ func LoadAndWatchUsers() {
                 if event.Has(fsnotify.Write) {
                     log.Println("[INFO - USERS] 检测到用户配置文件变更")
                     // 文件发生写入操作，调用 Load 函数
-                    err := loadUsers(event.Name)
+                    err := loadRolesAndUsers(event.Name)
                     if err != nil {
                         log.Printf("[ERROR - USERS] %v\n", err)
                     }
@@ -116,9 +132,15 @@ func LoadAndWatchUsers() {
         panic(err)
     }
     // 手动触发一次
-    err = loadUsers(absPath)
+    err = loadRolesAndUsers(absPath)
     if err != nil {
         panic(err)
+    }
+}
+
+func ForeachRoles(action func(role *models.Role)) {
+    for _, role := range roles {
+        action(role)
     }
 }
 

@@ -11,9 +11,17 @@ type Config struct {
         AccessMethods []AccessMethod `yaml:"access-methods"`
     } `yaml:"app"`
     // OpenAI 相关配置
-    OpenAI struct {
+    OpenAI []struct {
+        // ID
+        ID string `yaml:"id"`
+        // OpenAI Org ID
+        OrgId string `yaml:"org-id"`
         // OpenAI API Key
         ApiKey string `yaml:"apikey"`
+        // 支持的 OpenAI 模型
+        Models []OpenAiModel `yaml:"models"`
+        // 激活命令集
+        Commands []string `yaml:"commands"`
     } `yaml:"openai"`
     // 邮箱配置
     Email struct {
@@ -43,5 +51,6 @@ type Config struct {
 }
 
 type UserConfig struct {
+    Roles []*Role          `yaml:"roles"`
     Users map[string]*User `yaml:"users"`
 }

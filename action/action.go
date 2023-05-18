@@ -51,7 +51,7 @@ func DoAction(sessionId string, requestId string, user *models.User, req models.
     if action = Actions[command]; action == nil {
         action = Actions[defaultActionCommand]
         if action == nil {
-            panic(errors.New("未知指令：%s", command))
+            return nil, errors.NewNormalError("未知指令：%s", command)
         }
     }
     // 拆分 Command 参数集与普通 Content 数据集
@@ -65,6 +65,10 @@ func DoAction(sessionId string, requestId string, user *models.User, req models.
         }
     }
     // 执行 Action
-    resp, err = action.Action(sessionId, requestId, user, commandArgs, contents)
+    if resp, err = action.Action(sessionId, requestId, user, commandArgs, contents); err != nil {
+        if err == ErrorNoPermission {
+            return nil, errors.NewNormalError("未知指令：%s", command)
+        }
+    }
     return
 }

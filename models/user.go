@@ -6,6 +6,10 @@ type User struct {
     ID string
     // 用户名
     Name string `yaml:"name"`
+    // 角色
+    Role *Role `yaml:"-"`
+    // 角色名称
+    RoleName string `yaml:"role"`
     // 邮箱地址
     Emails []string `yaml:"emails"`
 }

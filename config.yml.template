@@ -4,7 +4,17 @@ app:
   access-methods:
     - email
 openai:
-  apikey: <OpenAI API Key>
+  -
+    id: <Instance ID>
+    org-id: <OpenAI Org ID>
+    apikey: <OpenAI API Key>
+    models:
+      - gpt3.5
+    commands:
+      - ChatGPT
+      - GPT3.5
+      - GPT3_5
+      - GPT3-5
 email:
   smtp:
     host: <SMTP Host>

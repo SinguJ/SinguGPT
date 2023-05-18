@@ -3,7 +3,7 @@ module SinguGPT
 go 1.18
 
 require (
-	github.com/emersion/go-imap/v2 v2.0.0-alpha.3
+	github.com/emersion/go-imap/v2 v2.0.0-alpha.4
 	github.com/emersion/go-message v0.16.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
