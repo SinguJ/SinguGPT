@@ -43,5 +43,6 @@ type Config struct {
 }
 
 type UserConfig struct {
+    Roles []*Role          `yaml:"roles"`
     Users map[string]*User `yaml:"users"`
 }

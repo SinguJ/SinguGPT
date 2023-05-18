@@ -1,11 +1,18 @@
+roles:
+  -
+    name: normal
+    perms:
+      - <Permission>
 users:
   userid1:
     name: Foo
+    role: normal
     emails:
       - foo@example.com
       - foo@gmail.com
   userid2:
     name: Bar
+    role: normal
     emails:
       - bar@example.com
       - bar@gmail.com
