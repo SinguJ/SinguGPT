@@ -40,7 +40,7 @@ func init() {
         content := strings.Join(utils.Map(contents.Find(models.TagBody), func(content models.Content) string {
             return content.ToString()
         }), "\n")
-        req := openai.NewChatRequest(sessionId, user, content)
+        req := openai.NewChatRequest(openai.GPT3Dot5, sessionId, user, content)
         resp, err := openai.Chat(req)
         if err != nil {
             return nil, err
@@ -52,5 +52,5 @@ func init() {
             markdown,
             models.NewFileContent("原文.md", markdown),
         }, nil
-    }, "ChatGPT", "GPT3", "GPT-3", "GPT3.0", "GPT-3.0")
+    }, "ChatGPT", "GPT3_5", "GPT-3", "GPT3_5.0", "GPT-3.0")
 }

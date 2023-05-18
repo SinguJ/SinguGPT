@@ -36,9 +36,9 @@ func Login(apiKey string) {
     client = openai.NewClientWithConfig(config)
 }
 
-func NewChatRequest(sessionKey string, _ *models.User, content string) *openai.ChatCompletionRequest {
+func NewChatRequest(model Model, sessionKey string, _ *models.User, content string) *openai.ChatCompletionRequest {
     return &openai.ChatCompletionRequest{
-        Model: openai.GPT3Dot5Turbo,
+        Model: string(model),
         User:  sessionKey,
         Messages: []openai.ChatCompletionMessage{
             {
