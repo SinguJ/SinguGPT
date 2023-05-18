@@ -1,6 +1,7 @@
 package action
 
 import (
+    "SinguGPT/store"
     "regexp"
     "strings"
 
@@ -36,12 +37,14 @@ func responseOptimization(input string) string {
 }
 
 func init() {
+    client := openai.NewClient("", store.Config.OpenAI.ApiKey)
+
     RegisterActionFunc(func(sessionId string, _ string, user *models.User, _ models.Contents, contents models.Contents) (models.Contents, error) {
         content := strings.Join(utils.Map(contents.Find(models.TagBody), func(content models.Content) string {
             return content.ToString()
         }), "\n")
         req := openai.NewChatRequest(openai.GPT3Dot5, sessionId, user, content)
-        resp, err := openai.Chat(req)
+        resp, err := client.Chat(req)
         if err != nil {
             return nil, err
         }
