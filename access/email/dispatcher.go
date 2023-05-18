@@ -1,6 +1,7 @@
 package email
 
 import (
+    "SinguGPT/errors"
     "fmt"
     "log"
     "time"
@@ -13,6 +14,22 @@ import (
     "SinguGPT/models"
     "SinguGPT/store"
 )
+
+func getErrorMsg(err any) (userMsg string, errMsg string) {
+    switch err.(type) {
+    case errors.ProgramError:
+        _err := err.(errors.ProgramError)
+        userMsg = "服务器异常"
+        errMsg = _err.Error()
+    case errors.NormalError:
+        _err := err.(errors.NormalError)
+        userMsg = _err.Error()
+    default:
+        userMsg = "服务器异常"
+        errMsg = fmt.Sprintf("%v", err)
+    }
+    return
+}
 
 type Dispatcher struct {
     smtpClient *smtp.Client
@@ -63,13 +80,20 @@ func (d *Dispatcher) Listen() error {
                 }
             case mail := <-d.mails:
                 go func() {
+                    requestId := "<UNKNOWN>"
+                    defer func() {
+                        if err := recover(); err != nil {
+                            userMsg, errMsg := getErrorMsg(err)
+                            log.Printf("[ERROR]--- %s %s%s", requestId, userMsg, errMsg)
+                        }
+                    }()
                     email := mail.From[0][0]
                     user := store.FindUser(email)
                     if user == nil {
                         log.Printf("[WARNING] 邮箱用户 %s<%s> 不是有效用户，跳过\n", mail.From[0][1], mail.From[0][0])
                         return
                     }
-                    requestId := uuid.NewString()
+                    requestId = uuid.NewString()
                     log.Printf("[INFO]>>> %s 处理用户 %s<%s> 的请求\n", requestId, user.Name, email)
                     // 解析命令
                     commands := parseCommand(mail.Subject)
@@ -108,11 +132,12 @@ func (d *Dispatcher) Listen() error {
                     }
                     resp, err := d.messageHandler(user.ID, requestId, user, contents)
                     if err != nil {
+                        userMsg, errMsg := getErrorMsg(err)
                         resp = models.Contents{
                             models.NewTextContent(models.TagTitle, "ERROR"),
-                            models.NewTextContent(models.TagError, fmt.Sprintf("%v", err)),
+                            models.NewTextContent(models.TagError, userMsg),
                         }
-                        log.Printf("[ERROR]--- %s %v", requestId, err)
+                        log.Printf("[ERROR]--- %s %s", requestId, errMsg)
                     }
                     err = d.smtpClient.Push(user, email, resp)
                     if err != nil {

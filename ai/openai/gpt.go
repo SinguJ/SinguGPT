@@ -14,12 +14,18 @@ import (
     "SinguGPT/models"
 )
 
-var client *openai.Client
-
 const SystemContent = `ASSISTANT's response must be in Markdown syntax format.`
 
-func Login(apiKey string) {
-    config := openai.DefaultConfig(apiKey)
+// Client OpenAI 客户端
+type Client struct {
+    orgId  string
+    apiKey string
+
+    client *openai.Client
+}
+
+func (c *Client) login() {
+    config := openai.DefaultConfig(c.apiKey)
     if proxyServ := os.Getenv("SINGU_GPT_PROXY"); proxyServ != "" {
         log.Printf("使用代理服务器：%s\n", proxyServ)
         _proxyUrl, err := url.Parse(proxyServ)
@@ -33,38 +39,21 @@ func Login(apiKey string) {
         }
         config.HTTPClient = httpClient
     }
-    client = openai.NewClientWithConfig(config)
+    c.client = openai.NewClientWithConfig(config)
 }
 
-func NewChatRequest(sessionKey string, _ *models.User, content string) *openai.ChatCompletionRequest {
-    return &openai.ChatCompletionRequest{
-        Model: openai.GPT3Dot5Turbo,
-        User:  sessionKey,
-        Messages: []openai.ChatCompletionMessage{
-            {
-                Role:    openai.ChatMessageRoleSystem,
-                Content: SystemContent,
-            },
-            {
-                Role:    openai.ChatMessageRoleUser,
-                Content: content,
-            },
-        },
-    }
-}
-
-func Chat(req *openai.ChatCompletionRequest) (string, error) {
+func (c *Client) Chat(req *openai.ChatCompletionRequest) (string, error) {
     ctx := context.Background()
-    response, err := client.CreateChatCompletion(ctx, *req)
+    response, err := c.client.CreateChatCompletion(ctx, *req)
     if err != nil {
         return "", errors.New(fmt.Sprintf("CompletionStream error: %v\n", err))
     }
     return response.Choices[0].Message.Content, nil
 }
 
-func ChatStream(req *openai.ChatCompletionRequest) (*openai.ChatCompletionStream, error) {
+func (c *Client) ChatStream(req *openai.ChatCompletionRequest) (*openai.ChatCompletionStream, error) {
     ctx := context.Background()
-    stream, err := client.CreateChatCompletionStream(ctx, *req)
+    stream, err := c.client.CreateChatCompletionStream(ctx, *req)
     if err != nil {
         return nil, errors.New(fmt.Sprintf("CompletionStream error: %v\n", err))
     }
@@ -80,4 +69,30 @@ func ChatStream(req *openai.ChatCompletionRequest) (*openai.ChatCompletionStream
     //	}
     //	fmt.Printf("%v", response.Choices[0].Delta.Content)
     // }
+}
+
+func NewClient(orgId string, apiKey string) *Client {
+    client := &Client{
+        orgId:  orgId,
+        apiKey: apiKey,
+    }
+    client.login()
+    return client
+}
+
+func NewChatRequest(model Model, sessionKey string, _ *models.User, content string) *openai.ChatCompletionRequest {
+    return &openai.ChatCompletionRequest{
+        Model: string(model),
+        User:  sessionKey,
+        Messages: []openai.ChatCompletionMessage{
+            {
+                Role:    openai.ChatMessageRoleSystem,
+                Content: SystemContent,
+            },
+            {
+                Role:    openai.ChatMessageRoleUser,
+                Content: content,
+            },
+        },
+    }
 }

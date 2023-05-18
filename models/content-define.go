@@ -86,7 +86,7 @@ func (contents *Contents) Find(tags ...Tag) []Content {
 func (contents *Contents) FindOne(tag Tag) (Content, error) {
     newContents := contents.Find(tag)
     if len(newContents) != 1 {
-        return nil, errors.New("未找到或存在多个 Tag 为 %s 的 Content 对象", tag)
+        return nil, errors.NewProgramError("未找到或存在多个 Tag 为 %s 的 Content 对象", tag)
     }
     return newContents[0], nil
 }
