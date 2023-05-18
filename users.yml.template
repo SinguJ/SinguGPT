@@ -2,7 +2,7 @@ roles:
   -
     name: normal
     perms:
-      - <Permission>
+      - <OpenAI Instance ID>
 users:
   userid1:
     name: Foo

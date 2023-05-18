@@ -10,6 +10,16 @@ import (
     "SinguGPT/utils"
 )
 
+func verifyPermission(perm string, user *models.User) bool {
+    // 获取用户具有的角色
+    role := user.Role
+    // 判断该角色是否具有该权限
+    for _, _perm := range role.Perms {
+        if _perm == perm {
+            return true
+        }
+    }
+    return false
 }
 
 func toOpenAiModel(model models.OpenAiModel) openai.Model {
@@ -25,6 +35,11 @@ func toOpenAiModel(model models.OpenAiModel) openai.Model {
 
 func newOpenAiAction(client *openai.Client, perm string, model openai.Model, commands ...string) {
     RegisterActionFunc(func(sessionId string, _ string, user *models.User, _ models.Contents, contents models.Contents) (models.Contents, error) {
+        // 校验该用户是否具有对该模型的使用权限
+        if !verifyPermission(perm, user) {
+            return nil, ErrorNoPermission
+        }
+
         content := strings.Join(utils.Map(contents.Find(models.TagBody), func(content models.Content) string {
             return content.ToString()
         }), "\n")
